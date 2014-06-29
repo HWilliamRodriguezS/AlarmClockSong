@@ -24,18 +24,46 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f080000;
+        public static final int action_settings=0x7f080004;
+        public static final int addAlarm=0x7f080000;
+        public static final int stopAlarm=0x7f080003;
+        public static final int tAlarms=0x7f080001;
+        public static final int time=0x7f080002;
     }
     public static final class layout {
         public static final int activity_main_alarm=0x7f030000;
+        public static final int activity_set_alarm=0x7f030001;
+        public static final int alarm=0x7f030002;
     }
     public static final class menu {
         public static final int main_alarm=0x7f070000;
     }
     public static final class string {
+        /**  The text displayed when you open the preferences of the app 
+         */
         public static final int action_settings=0x7f050001;
+        public static final int active_alarm=0x7f050006;
+        /**  Text displayed when you push the button 'add alarm' 
+         */
+        public static final int add_alarm=0x7f050002;
+        /**  The text as name displayed on the top of the application when opened 
+         */
         public static final int app_name=0x7f050000;
-        public static final int hello_world=0x7f050002;
+        /**  This is the character use to concatenate the selected days  
+         on the repeat option in the alarm                      
+         */
+        public static final int day_concat=0x7f050005;
+        public static final int every_day=0x7f050008;
+        public static final int never=0x7f050009;
+        public static final int select_days=0x7f050007;
+        /**  Text displayed when the screen to set the alarm is opened 
+         */
+        public static final int set_alarm=0x7f050003;
+        public static final int stop_alarm=0x7f05000a;
+        /**  Text displayed for the text in the Set Alarm Screen to ask the time  
+         */
+        public static final int time=0x7f050004;
+        public static final int time_7_am=0x7f05000b;
     }
     public static final class style {
         /** 
