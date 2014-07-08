@@ -7,6 +7,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 
 import com.bootbraing.alarmclocksong.models.Alarm;
 import com.bootbraing.alarmclocksong.models.AlarmReaderContract.AlarmEntry;
@@ -31,7 +32,8 @@ public class AlarmDAO {
 				AlarmEntry.COLUMN_NAME_ENABLED, AlarmEntry.COLUMN_NAME_HOUR,
 				AlarmEntry.COLUMN_NAME_MINUTES, AlarmEntry.COLUMN_NAME_TIME,
 				AlarmEntry.COLUMN_NAME_VIBRATE, AlarmEntry.COLUMN_NAME_LABEL,
-				AlarmEntry.COLUMN_NAME_ALERT, AlarmEntry.COLUMN_NAME_SILENT, };
+				AlarmEntry.COLUMN_NAME_ALERT, AlarmEntry.COLUMN_NAME_SILENT,
+				AlarmEntry.COLUMN_NAME_DAYSOFWEEK};
 		Cursor cursor = db.query(AlarmEntry.TABLE_NAME, tableColumns,
 				AlarmEntry._ID + "=?",
 				new String[] { String.valueOf(alarmId) }, null, null, null,
@@ -48,7 +50,9 @@ public class AlarmDAO {
 		alarm.setTime(cursor.getInt(5));
 		alarm.setVibrate(cursor.getInt(6) == 1 ? true : false);
 		alarm.setLabel(cursor.getString(7));
-		alarm.setSilent((cursor.getInt(8) == 1) ? true : false);
+		alarm.setAlert(Uri.parse(cursor.getString(8)));
+		alarm.setSilent((cursor.getInt(9) == 1) ? true : false);
+		alarm.setDaysOfWeek(new Alarm.DaysOfWeek(cursor.getInt(10)));
 		}
 		
 		return alarm;
@@ -70,6 +74,7 @@ public class AlarmDAO {
 		contentValues.put(AlarmEntry.COLUMN_NAME_LABEL, alarm.getLabel());
 		contentValues.put(AlarmEntry.COLUMN_NAME_ALERT, alarm.getAlert().toString());
 		contentValues.put(AlarmEntry.COLUMN_NAME_SILENT, alarm.isSilent() ? 1: 0);
+		contentValues.put(AlarmEntry.COLUMN_NAME_DAYSOFWEEK,alarm.getDaysOfWeek().getCoded());
 		// Insert into DB
 		db.insert("alarms", null, contentValues);
 	}
@@ -97,13 +102,11 @@ public class AlarmDAO {
 		String[] tableColumns = new String[] {
 				AlarmEntry._ID,
 				AlarmEntry.COLUMN_NAME_ALARM_ID,
-				AlarmEntry.COLUMN_NAME_ENABLED,
-				// AlarmEntry.COLUMN_NAME_SUBTITLE,
-				AlarmEntry.COLUMN_NAME_HOUR, AlarmEntry.COLUMN_NAME_MINUTES,
-				AlarmEntry.COLUMN_NAME_TIME,
-				// AlarmEntry.COLUMN_NAME_DAYSOFWEEK,
+				AlarmEntry.COLUMN_NAME_ENABLED,	AlarmEntry.COLUMN_NAME_HOUR, 
+				AlarmEntry.COLUMN_NAME_MINUTES,	AlarmEntry.COLUMN_NAME_TIME,
 				AlarmEntry.COLUMN_NAME_VIBRATE, AlarmEntry.COLUMN_NAME_LABEL,
-				AlarmEntry.COLUMN_NAME_ALERT, AlarmEntry.COLUMN_NAME_SILENT, };
+				AlarmEntry.COLUMN_NAME_ALERT  , AlarmEntry.COLUMN_NAME_SILENT, 
+				AlarmEntry.COLUMN_NAME_DAYSOFWEEK};
 
 		// Query the database
 		Cursor cursor = db.query("alarms", tableColumns, null, null, null,
@@ -122,8 +125,9 @@ public class AlarmDAO {
 			alarm.setTime(cursor.getInt(5));
 			alarm.setVibrate(cursor.getInt(6) == 1 ? true : false);
 			alarm.setLabel(cursor.getString(7));
-			alarm.setSilent((cursor.getInt(8) == 1) ? true : false);
-
+			alarm.setAlert(Uri.parse(cursor.getString(8)));
+			alarm.setSilent((cursor.getInt(9) == 1) ? true : false);
+			alarm.setDaysOfWeek(new Alarm.DaysOfWeek(cursor.getInt(10)));
 			alarmList.add(alarm);
 
 			cursor.moveToNext();
@@ -143,11 +147,12 @@ public class AlarmDAO {
 		contentValues.put(AlarmEntry.COLUMN_NAME_LABEL, alarm.getLabel());
 		contentValues.put(AlarmEntry.COLUMN_NAME_ALERT, alarm.getAlert().toString());
 		contentValues.put(AlarmEntry.COLUMN_NAME_SILENT, alarm.isSilent() ? 1: 0);
+		contentValues.put(AlarmEntry.COLUMN_NAME_DAYSOFWEEK,alarm.getDaysOfWeek().getCoded());
 		
 		// updating row
 		return db.update(AlarmEntry.TABLE_NAME, 
 				         contentValues, 
-				         AlarmEntry.COLUMN_NAME_ALARM_ID + " = ?",
+				         AlarmEntry._ID + " = ?",
 				         new String[] { String.valueOf(alarm.getId()) });
 	}
 

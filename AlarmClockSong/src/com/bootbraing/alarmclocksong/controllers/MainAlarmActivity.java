@@ -1,12 +1,13 @@
 package com.bootbraing.alarmclocksong.controllers;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -30,18 +31,6 @@ public class MainAlarmActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main_alarm);
-		
-		// Create an offset from the current time in which the alarm will go
-		// off.
-		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.SECOND, 5);
-
-		// Create a new PendingIntent and add it to the AlarmManager
-//		Intent intent = new Intent(this, AlarmReceiverActivity.class);
-//		PendingIntent pendingIntent = PendingIntent.getActivity(this, 12345,
-//				intent, PendingIntent.FLAG_CANCEL_CURRENT);
-//		AlarmManager am = (AlarmManager) getSystemService(Activity.ALARM_SERVICE);
-//		am.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);
 		listAllAlarms();
 	}
 
@@ -59,7 +48,6 @@ public class MainAlarmActivity extends Activity {
 
 	public void toogleAlarm(View v) {
 		System.out.println("Im in");
-
 	}
 
 	public void listAllAlarms() {
@@ -69,20 +57,23 @@ public class MainAlarmActivity extends Activity {
 				.findViewById(R.id.tAlarms);
 		for (Alarm alrm : alarms) {
 			TableRow row = new TableRow(this);
-			TableRow.LayoutParams lp = new TableRow.LayoutParams(
-					TableRow.LayoutParams.MATCH_PARENT);
+			TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT);
 			row.setLayoutParams(lp);
 			row.setId((int) alrm.getId());
 			ToggleButton tbOnOff = new ToggleButton(this);
 			tbOnOff.setChecked(alrm.isEnabled());
+		    //tbOnOff.setBackgroundResource(R.drawable.alarm_clock_32);
+			tbOnOff.setWidth(128);
+			tbOnOff.setHeight(128);
+			tbOnOff.setBackgroundColor(Color.TRANSPARENT);
+			tbOnOff.setButtonDrawable(R.layout.alarm_on_off);
 			
-		/*	Toast.makeText(getApplicationContext(),
-					"Alarm After Update : " + alarms, Toast.LENGTH_LONG)
-					.show();*/
+			/*tbOnOff.setWidth(64\\);
+			tbOnOff.setHeight(64);
+			tbOnOff.setGravity(Gravity.CENTER);
+			tbOnOff.buildDrawingCache(true);*/
 			
-			// Creating the ToggleButton Even onchange/onChecked
-			// ToggleButton tbOnOff = new ToggleButton(this);
-			// tbOnOff.setText("On");
+
 			tbOnOff.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 				public void onCheckedChanged(CompoundButton buttonView,
@@ -108,8 +99,17 @@ public class MainAlarmActivity extends Activity {
 					Toast.makeText(getApplicationContext(),
 							"Alarm After Update : " + alarm, Toast.LENGTH_LONG)
 							.show();*/
+					new AlarmDAO(getApplicationContext()).update(alarm);
+					
 				}
 			});
+			
+			Log.d("Alarm ID","Alarm ID : " + alrm.getId());
+			Log.d("Alarm Label","Alarm Label : " + alrm.getLabel() );
+			Log.d("Alarm Days","Alarm Days : " + alrm.getDaysOfWeek().toString(this, false));
+			Log.d("Alarm Ringtone","Alarm Ringtone : " + alrm.getAlert().toString());
+			Log.d("=====","======");
+			//Log.d(" ","");
 
 			TextView tvTimeNTitle = new TextView(this);
 			tvTimeNTitle.setText("" + alrm.getLabel());

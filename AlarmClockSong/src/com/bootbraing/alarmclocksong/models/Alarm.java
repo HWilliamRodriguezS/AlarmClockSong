@@ -5,10 +5,12 @@ import java.util.Calendar;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.bootbraing.alarmclocksong.R;
 
-public class Alarm {
+public class Alarm implements Parcelable {
 
 	private int id = 0;
 	private boolean enabled = false;
@@ -42,66 +44,21 @@ public class Alarm {
 		this.silent = silent;
 		this.alarmFormat = AlarmFormat.HOUR_24;
 	}
-
-	static final class DaysOfWeek {
-
-        private static int[] DAY_MAP = new int[] {
-            Calendar.MONDAY,
-            Calendar.TUESDAY,
-            Calendar.WEDNESDAY,
-            Calendar.THURSDAY,
-            Calendar.FRIDAY,
-            Calendar.SATURDAY,
-            Calendar.SUNDAY,
-        };
-
-        // Bitmask of all repeating days
-        private int mDays;
-
-        DaysOfWeek(int days) {
-            mDays = days;
-        }
-
-        public String toString(Context context, boolean showNever) {
-            StringBuilder ret = new StringBuilder();
-
-            // no days
-            if (mDays == 0) {
-               return showNever ? context.getText(R.string.never).toString() : "";
-            }
-
-            // every day
-            if (mDays == 0x7f) {
-               return context.getText(R.string.every_day).toString();
-            }
-
-            // count selected days
-            int dayCount = 0, days = mDays;
-            while (days > 0) {
-                if ((days & 1) == 1) dayCount++;
-                days >>= 1;
-            }
-
-            // short or long form?
-            DateFormatSymbols dfs = new DateFormatSymbols();
-            String[] dayList = (dayCount > 1) ?
-                    dfs.getShortWeekdays() :
-                    dfs.getWeekdays();
-
-            // selected days
-            for (int i = 0; i < 7; i++) {
-                if ((mDays & (1 << i)) != 0) {
-                    ret.append(dayList[DAY_MAP[i]]);
-                    dayCount -= 1;
-                  if (dayCount > 0) 
-                	 ret.append(context.getText(R.string.select_days));
-                	 // ret.append("Select Days");
-                }
-            }
-            return ret.toString();
-        }
-	}
 	
+	public Alarm(Parcel in) {
+		
+		id = in.readInt();
+		enabled =(in.readInt() == 1)?true:false;
+		hour = in.readInt();
+		minutes = in.readInt();
+		daysOfWeek = new DaysOfWeek(in.readInt());
+		time = in.readInt();
+		vibrate = (in.readInt() == 1)?true:false;
+		label = in.readString();
+	    alert = Uri.parse(in.readString());
+		silent = (in.readInt() == 1)?true:false;
+	}
+
 	public int getId() {
 		return id;
 	}
@@ -248,5 +205,158 @@ public class Alarm {
 		return null;
 	}
 	*/
+	
+	public static final class DaysOfWeek {
+
+        private static int[] DAY_MAP = new int[] {
+            Calendar.MONDAY,
+            Calendar.TUESDAY,
+            Calendar.WEDNESDAY,
+            Calendar.THURSDAY,
+            Calendar.FRIDAY,
+            Calendar.SATURDAY,
+            Calendar.SUNDAY,
+        };
+
+        // Bitmask of all repeating days
+        private int mDays;
+
+        public DaysOfWeek(int days) {
+            mDays = days;
+        }
+
+        public String toString(Context context, boolean showNever) {
+            StringBuilder ret = new StringBuilder();
+
+            // no days
+            if (mDays == 0) {
+                return showNever ?
+                        context.getText(R.string.never).toString() : "";
+            }
+
+            // every day
+            if (mDays == 0x7f) {
+                return context.getText(R.string.every_day).toString();
+            }
+
+            // count selected days
+            int dayCount = 0, days = mDays;
+            while (days > 0) {
+                if ((days & 1) == 1) dayCount++;
+                days >>= 1;
+            }
+
+            // short or long form?
+            DateFormatSymbols dfs = new DateFormatSymbols();
+            String[] dayList = (dayCount > 1) ?
+                    dfs.getShortWeekdays() :
+                    dfs.getWeekdays();
+
+            // selected days
+            for (int i = 0; i < 7; i++) {
+                if ((mDays & (1 << i)) != 0) {
+                    ret.append(dayList[DAY_MAP[i]]);
+                    dayCount -= 1;
+                    if (dayCount > 0) ret.append(
+                            context.getText(R.string.day_concat));
+                }
+            }
+            return ret.toString();
+        }
+
+        private boolean isSet(int day) {
+            return ((mDays & (1 << day)) > 0);
+        }
+
+        public void set(int day, boolean set) {
+            if (set) {
+                mDays |= (1 << day);
+            } else {
+                mDays &= ~(1 << day);
+            }
+        }
+
+        public void set(DaysOfWeek dow) {
+            mDays = dow.mDays;
+        }
+
+        public int getCoded() {
+            return mDays;
+        }
+
+        // Returns days of week encoded in an array of booleans.
+        public boolean[] getBooleanArray() {
+            boolean[] ret = new boolean[7];
+            for (int i = 0; i < 7; i++) {
+                ret[i] = isSet(i);
+            }
+            return ret;
+        }
+
+        public boolean isRepeatSet() {
+            return mDays != 0;
+        }
+
+        /**
+         * returns number of days from today until next alarm
+         * @param c must be set to today
+         */
+        public int getNextAlarm(Calendar c) {
+            if (mDays == 0) {
+                return -1;
+            }
+
+            int today = (c.get(Calendar.DAY_OF_WEEK) + 5) % 7;
+
+            int day = 0;
+            int dayCount = 0;
+            for (; dayCount < 7; dayCount++) {
+                day = (today + dayCount) % 7;
+                if (isSet(day)) {
+                    break;
+                }
+            }
+            return dayCount;
+        }
+    }
+	
+	@Override
+	public int describeContents() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeInt(id);
+		dest.writeInt(enabled?1:0);
+		dest.writeInt(hour);
+		dest.writeInt(minutes);
+		dest.writeInt(daysOfWeek.getCoded());
+		dest.writeInt((int)time);
+		dest.writeInt(vibrate?1:0);
+		dest.writeString(label);
+		dest.writeString(alert.toString());
+		dest.writeInt(silent?1:0);
+		//dest.writeMap(AlarmFormat.HOUR_24);
+		/* 
+		this.vibrate = vibrate;
+		this.label = label;
+		this.alert = alert;
+		this.silent = silent;
+		this.alarmFormat = AlarmFormat.HOUR_24;
+		 * */
+		
+	}
+	
+	public static final Parcelable.Creator<Alarm> CREATOR = new Parcelable.Creator<Alarm>() {
+        public Alarm createFromParcel(Parcel in) {
+            return new Alarm(in);
+        }
+
+        public Alarm[] newArray(int size) {
+            return new Alarm[size];
+        }
+    };
 	
 }

@@ -30,8 +30,17 @@
     <string name="every_day">Every Day</string>
     
     
+    <string name="alarm_repeat">Repeat</string>
+    
+    
+    <string name="ringtone">Ringtone</string>
+    
+    <string name="vibrate">Vibrate</string>
+    
     <string name="never">Never</string>
     
+    
+    <string name="label">Label</string>
     
     <string name="stop_alarm" >Stop Alarm</string>
     <string name="time_7_am" >7:00</string>
