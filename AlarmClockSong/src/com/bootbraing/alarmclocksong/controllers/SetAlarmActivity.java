@@ -49,7 +49,7 @@ public class SetAlarmActivity extends Activity {
 		alarm.setAlarmFormat(AlarmFormat.HOUR_24);
 		alarmMgr = (AlarmManager) getSystemService(Activity.ALARM_SERVICE);
 		Intent intent = new Intent(this, AlarmReceiverActivity.class);
-		PendingIntent alarmIntent = PendingIntent.getActivity(this, 12345, intent,
+		PendingIntent alarmIntent = PendingIntent.getActivity(this, Integer.parseInt(alarm.getHour() + "" + alarm.getMinutes()), intent,
 				PendingIntent.FLAG_CANCEL_CURRENT);
 
 		// Set the alarm to start at
