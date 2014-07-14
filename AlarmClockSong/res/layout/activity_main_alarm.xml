@@ -11,13 +11,13 @@
     
    <LinearLayout android:layout_width="match_parent"
                  android:layout_height="wrap_content" 
-                 >
+                 android:onClick="addNewAlarm">
        
        <Button android:id="@+id/addAlarm"
                android:background="@android:drawable/ic_input_add"
                android:layout_width="wrap_content"
                android:layout_height="wrap_content" 
-               android:onClick="addNewAlarm"
+               
               
                />
        

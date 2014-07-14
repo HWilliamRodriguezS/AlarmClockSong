@@ -86,8 +86,10 @@ public class AlarmReceiverActivity extends Activity {
  
     private Uri getAlarmUri() {
       
+        //Log.d("Before getting in " ,alarm.getAlert() + "");
         if (alarm.getAlert() == null  || alarm.getAlert().toString() == "" ) {
             alarm.setAlert(Settings.System.DEFAULT_ALARM_ALERT_URI);
+            //Log.d("Default Alarm :" ,Settings.System.DEFAULT_ALARM_ALERT_URI + "'");
             if (alarm.getAlert() == null  || alarm.getAlert().toString() == "") {
             	alarm.setAlert(Settings.System.DEFAULT_ALARM_ALERT_URI);
             }

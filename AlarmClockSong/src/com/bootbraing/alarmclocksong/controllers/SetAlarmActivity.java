@@ -8,8 +8,6 @@ import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -31,7 +29,7 @@ import com.bootbraing.alarmclocksong.models.Alarm.AlarmFormat;
 import com.bootbraing.alarmclocksong.models.AlarmReaderContract.AlarmEntry;
 import com.bootbraing.alarmclocksong.utils.RepeatPreference;
 
-public class SetAlarmActivity extends PreferenceActivity implements OnSharedPreferenceChangeListener {
+public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPreferenceChangeListener*/ {
 
 //	private final int MAIN_ALARM_ACTIVITY = 1;
 //	private final int SET_ALARM_ACTIVITY = 2;
@@ -45,8 +43,7 @@ public class SetAlarmActivity extends PreferenceActivity implements OnSharedPref
 	private CheckBoxPreference menuVibrate;
 	
 	private Alarm alarm = new Alarm();
-	//private OnSharedPreferenceChangeListener listener;
-	SharedPreferences prefs;
+	//private SharedPreferences prefs;
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -54,49 +51,42 @@ public class SetAlarmActivity extends PreferenceActivity implements OnSharedPref
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.set_alarm_prefs);
 	    PreferenceManager.setDefaultValues(SetAlarmActivity.this, R.xml.set_alarm_prefs,false);
-	    prefs = PreferenceManager.getDefaultSharedPreferences(this);//PreferenceManager.getDefaultSharedPreferences(this);
 	    
-	  /*  listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-	    	  public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-	    		   menuLabelPref.setSummary(menuLabelPref.getText());
-	    		    Log.d("Got In att","Got in att");
-	    	  }
-	    	};*/
-
-	    prefs.registerOnSharedPreferenceChangeListener(this);
-		
+	   /* prefs = PreferenceManager.getDefaultSharedPreferences(this);
+	    // prefs.registerOnSharedPreferenceChangeListener(this);
+*/		
 		menuTimePref = findPreference("time");
+		
 		menuLabelPref = (EditTextPreference)findPreference("label");
 		menuLabelPref.setOnPreferenceChangeListener(
                 new Preference.OnPreferenceChangeListener() {
                     public boolean onPreferenceChange(Preference p,
                             Object newValue) {
-                        // Set the summary based on the new label.
                         p.setSummary((String) newValue);
                         return true;
                     }
                 });
 		
 		menuRepeat = (RepeatPreference) findPreference("setRepeat");
+		
 		menuRingtone = (RingtonePreference) findPreference("ringtone");
 		menuRingtone.setOnPreferenceChangeListener(new RingtonePreference.OnPreferenceChangeListener() {
                     public boolean onPreferenceChange(Preference p,
                             Object newValue) {
-                    	Uri ringtoneUri = Uri.parse((String)newValue);
-                    	Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), ringtoneUri);
-                    	String name = ringtone.getTitle(getApplicationContext());
+						String name = RingtoneManager.getRingtone(
+								getApplicationContext(),
+								Uri.parse((String) newValue)).getTitle(
+								getApplicationContext());
                         p.setSummary((String) name);
                         return true;
                     }
                 });
-		menuVibrate = (CheckBoxPreference) findPreference("vibrate");
-		//setContentView(R.layout.activity_set_alarm);
-		//tvTime = (TextView) findViewById(R.id.time);
 		
+		menuVibrate = (CheckBoxPreference) findPreference("vibrate");
 		alarmDAO = new AlarmDAO(this);
 	}
 	
-	@SuppressWarnings("deprecation")
+	/*@SuppressWarnings("deprecation")
 	@Override
 	protected void onResume() {
 	    super.onResume();
@@ -110,7 +100,7 @@ public class SetAlarmActivity extends PreferenceActivity implements OnSharedPref
 	    super.onPause();
 	    // Unregister the listener whenever a key changes
 	    getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
-	}
+	}*/
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -152,13 +142,9 @@ public class SetAlarmActivity extends PreferenceActivity implements OnSharedPref
 							int selectedHour, int selectedMinute) {
 						alarm.setHour(selectedHour);
 						alarm.setMinutes(selectedMinute);
-//						alarm.setEnabled(true);
-//						alarm.setSilent(false);
-//						alarm.setLabel("test");
 						alarm.setAlarmFormat(AlarmFormat.HOUR_12);
-						//setAlarm(alarm);
-						//saveAlarm(alarm);
-						menuTimePref.setSummary("" + alarm.getHour() + ":" + alarm.getMinutes() + " " + alarm.getAMPM());
+						Log.d("Selected Time : ", selectedHour + " , " +selectedMinute);
+						menuTimePref.setSummary(alarm.getTimeStr());
 					}
 
 				}, hour, minute, false);// Yes 24 hour time
@@ -180,8 +166,6 @@ public class SetAlarmActivity extends PreferenceActivity implements OnSharedPref
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
 		
-	
-
 	public void saveAlarm(Alarm alarm){
 		alarmDAO.createAlarm(alarm);
 	}
@@ -201,21 +185,15 @@ public class SetAlarmActivity extends PreferenceActivity implements OnSharedPref
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		String strRingtonePreference = prefs.getString("ringtone", "DEFAULT_RINGTONE_URI");
 		Uri ringtoneUri = Uri.parse(strRingtonePreference);
-		//Ringtone ringtone = RingtoneManager.getRingtone(getBaseContext(), ringtoneUri);
 		alarm.setAlert(ringtoneUri);
 		alarm.setVibrate(menuVibrate.isChecked());
 		setAlarm(alarm);
 		saveAlarm(alarm);
 	}
 
-	@Override
+	/*@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 	    menuLabelPref.setSummary(menuLabelPref.getText());
-	    Log.d("Got IN","Got in");
-//	    if (pref instanceof ListPreference) {
-//	        ListPreference listPref = (ListPreference) pref;
-//	        pref.setSummary(listPref.getEntry());
-//	    }
-	}
+	}*/
 	
 }

@@ -46,10 +46,6 @@ public class MainAlarmActivity extends Activity {
 		startActivityForResult(i, SET_ALARM_ACTIVITY);
 	}
 
-	public void toogleAlarm(View v) {
-		System.out.println("Im in");
-	}
-
 	public void listAllAlarms() {
 		alarms = new AlarmDAO(this).getAlarms();
 
@@ -57,7 +53,8 @@ public class MainAlarmActivity extends Activity {
 				.findViewById(R.id.tAlarms);
 		for (Alarm alrm : alarms) {
 			TableRow row = new TableRow(this);
-			TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT);
+			//TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT);
+			TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
 			row.setLayoutParams(lp);
 			row.setId((int) alrm.getId());
 			ToggleButton tbOnOff = new ToggleButton(this);

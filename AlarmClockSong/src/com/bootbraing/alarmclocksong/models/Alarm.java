@@ -2,6 +2,7 @@ package com.bootbraing.alarmclocksong.models;
 
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
+import java.util.Locale;
 
 import android.content.Context;
 import android.net.Uri;
@@ -9,6 +10,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.bootbraing.alarmclocksong.R;
+
 
 public class Alarm implements Parcelable {
 
@@ -77,7 +79,7 @@ public class Alarm implements Parcelable {
 
 	public int getHour() {
 		
-		if(this.alarmFormat == AlarmFormat.HOUR_12){
+		if(this.alarmFormat == AlarmFormat.HOUR_12 && hour > 12){
 		   return (Integer) ((this.hour == 0)?"12":hour - 12);			
 		}
 		return hour;
@@ -144,8 +146,7 @@ public class Alarm implements Parcelable {
 	}
 	
 	public String getTimeStr(){
-		
-		return "" + hour + ":" + minutes ;
+		return String.format(Locale.getDefault(),"%2d:%02d %s",getHour(),getMinutes(),getAMPM()) ;
 	}
 	
 	@Override
@@ -184,27 +185,7 @@ public class Alarm implements Parcelable {
 		
 	}
 	
-	/*
-	public static Alarm getAlarm(int id,Cursor cursor){
-		long itemId = cursor.getLong(cursor.getColumnIndexOrThrow(AlarmEntry._ID));
-		long enabled = cursor.getLong(cursor.getColumnIndexOrThrow(AlarmEntry.COLUMN_NAME_ENABLED));
-		long hour = cursor.getLong(cursor.getColumnIndexOrThrow(AlarmEntry.COLUMN_NAME_HOUR));
-		long minutes = cursor.getLong(cursor.getColumnIndexOrThrow(AlarmEntry.COLUMN_NAME_MINUTES));
-		long minutes = cursor.getLong(cursor.getColumnIndexOrThrow(AlarmEntry.COLUMN_NAME_MINUTES));
-         
-		
-		this.daysOfWeek = daysOfWeek;
-		this.time = time;
-		this.vibrate = vibrate;
-		this.label = label;
-		this.alert = alert;
-		this.silent = silent;
-		this.alarmFormat = AlarmFormat.HOUR_24;
-		
-		
-		return null;
-	}
-	*/
+	
 	
 	public static final class DaysOfWeek {
 
@@ -307,7 +288,6 @@ public class Alarm implements Parcelable {
             }
 
             int today = (c.get(Calendar.DAY_OF_WEEK) + 5) % 7;
-
             int day = 0;
             int dayCount = 0;
             for (; dayCount < 7; dayCount++) {
@@ -322,7 +302,6 @@ public class Alarm implements Parcelable {
 	
 	@Override
 	public int describeContents() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -338,15 +317,6 @@ public class Alarm implements Parcelable {
 		dest.writeString(label);
 		dest.writeString(alert.toString());
 		dest.writeInt(silent?1:0);
-		//dest.writeMap(AlarmFormat.HOUR_24);
-		/* 
-		this.vibrate = vibrate;
-		this.label = label;
-		this.alert = alert;
-		this.silent = silent;
-		this.alarmFormat = AlarmFormat.HOUR_24;
-		 * */
-		
 	}
 	
 	public static final Parcelable.Creator<Alarm> CREATOR = new Parcelable.Creator<Alarm>() {
