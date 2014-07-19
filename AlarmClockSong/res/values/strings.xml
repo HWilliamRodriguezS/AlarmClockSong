@@ -20,18 +20,13 @@
          on the repeat option in the alarm                      -->
     <string name="day_concat">", "</string>
     
-    
     <string name="active_alarm">Active Alarm</string>
-    
     
     <string name="select_days" >Select Days</string>
     
-    
     <string name="every_day">Every Day</string>
     
-    
     <string name="alarm_repeat">Repeat</string>
-    
     
     <string name="ringtone">Ringtone</string>
     
@@ -39,11 +34,27 @@
     
     <string name="never">Never</string>
     
-    
     <string name="label">Label</string>
     
-    <string name="stop_alarm" >Stop Alarm</string>
-    <string name="time_7_am" >7:00</string>
+    <string name="done">Done</string>
     
-	
+    <string name="revert">Revert</string>
+    
+    <string name="delete">Delete</string>
+    
+    <string name="preferences">Preferences</string>
+    
+    <string name="silence">Silence</string>
+    
+    <string name="volumen_title">Volumen</string>
+    
+    <string name="volumen_summary">Set the Alarm\'s Volume</string>
+    
+    <string name="volumen_dialog_title">Alarm Volumen</string>
+    
+    <string name="stop_alarm" >Stop Alarm</string>
+    
+    <string name="time_7_am" >7:00</string>
+    <string name="snooze_alarm" >Snooze duration</string>
+    
 </resources>

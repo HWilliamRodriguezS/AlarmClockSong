@@ -86,7 +86,7 @@ public class AlarmDAO {
 	 */
 	public void deleteAlarm(int alarmId) {
 		// Delete from DB where id match
-		db.delete("alarms", AlarmEntry.COLUMN_NAME_ALARM_ID + " = " + alarmId,
+		db.delete("alarms", AlarmEntry._ID + " = " + alarmId,
 				null);
 	}
 

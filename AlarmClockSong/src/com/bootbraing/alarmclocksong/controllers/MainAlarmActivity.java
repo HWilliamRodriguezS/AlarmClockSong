@@ -3,18 +3,22 @@ package com.bootbraing.alarmclocksong.controllers;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.R.drawable;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.bootbraing.alarmclocksong.R;
@@ -38,14 +42,31 @@ public class MainAlarmActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main_alarm, menu);
+		
+		
+		
 		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		Intent i = new Intent(this, AlarmPreferences.class);
+		startActivityForResult(i, 10);
+		return super.onOptionsItemSelected(item);
 	}
 
 	public void addNewAlarm(View v) {
 		Intent i = new Intent(this, SetAlarmActivity.class);
 		startActivityForResult(i, SET_ALARM_ACTIVITY);
 	}
-
+	
+	public void editAlarm(Alarm alarm){
+		Intent i = new Intent(this, SetAlarmActivity.class);
+        i.putExtra("Alarm", alarm);
+		startActivityForResult(i, SET_ALARM_ACTIVITY);
+		
+	}
+	
 	public void listAllAlarms() {
 		alarms = new AlarmDAO(this).getAlarms();
 
@@ -75,7 +96,7 @@ public class MainAlarmActivity extends Activity {
 
 				public void onCheckedChanged(CompoundButton buttonView,
 						boolean isChecked) {
-
+					buttonView.setBackgroundResource(drawable.list_selector_background);
 					TableRow tr = (TableRow) buttonView.getParent();
 					Alarm alarm = new AlarmDAO(getApplicationContext()).getAlarm(tr.getId());
 					OnOffAlarm onOffAlarm = new OnOffAlarm();
@@ -112,6 +133,16 @@ public class MainAlarmActivity extends Activity {
 			tvTimeNTitle.setText("" + alrm.getLabel());
 			row.addView(tbOnOff);
 			row.addView(tvTimeNTitle);
+			row.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					
+					Toast.makeText(getApplicationContext(), "You Click the Alarm with ID : " + ((TableRow)v).getId(), Toast.LENGTH_SHORT).show();
+					editAlarm(new AlarmDAO(getApplicationContext()).getAlarm(((TableRow)v).getId()));
+					((TableRow)v).setBackgroundResource(drawable.list_selector_background);
+
+				}
+			});
 			table.addView(row);
 
 		}

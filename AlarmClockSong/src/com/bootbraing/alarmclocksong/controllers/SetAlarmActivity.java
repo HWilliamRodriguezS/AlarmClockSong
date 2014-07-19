@@ -18,9 +18,18 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.preference.RingtonePreference;
+import android.provider.Settings;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.View;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TableRow.LayoutParams;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.bootbraing.alarmclocksong.R;
 import com.bootbraing.alarmclocksong.dao.AlarmDAO;
@@ -42,6 +51,10 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
 	private RingtonePreference menuRingtone;
 	private CheckBoxPreference menuVibrate;
 	
+	private Button buttonCancel;
+	private Button buttonAcept;
+	private Button buttonDelete;
+	
 	private Alarm alarm = new Alarm();
 	//private SharedPreferences prefs;
 	
@@ -52,12 +65,26 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
 		addPreferencesFromResource(R.xml.set_alarm_prefs);
 	    PreferenceManager.setDefaultValues(SetAlarmActivity.this, R.xml.set_alarm_prefs,false);
 	    
-	   /* prefs = PreferenceManager.getDefaultSharedPreferences(this);
+	    /* prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	    // prefs.registerOnSharedPreferenceChangeListener(this);
-*/		
+        */	
+	    
+	    Intent intent = getIntent();
+	    Alarm editAlarm = (Alarm) intent.getParcelableExtra("Alarm");
+	    if(editAlarm != null){
+	    	 this.alarm = editAlarm;
+	    	 Toast.makeText(getApplicationContext(),"Extra Receibed : " + editAlarm , Toast.LENGTH_LONG).show();
+	    }else{
+//	    	alarm.setAlert(Settings.System.DEFAULT_ALARM_ALERT_URI);
+	    	alarm.setAlert(Settings.System.DEFAULT_ALARM_ALERT_URI);
+	    	Toast.makeText(getApplicationContext(),"Extra Not Receibed : " + alarm , Toast.LENGTH_LONG).show();
+	    }
+	    alarm.setAlarmFormat(AlarmFormat.HOUR_12);
 		menuTimePref = findPreference("time");
+		menuTimePref.setSummary(alarm.getTimeStr());
 		
 		menuLabelPref = (EditTextPreference)findPreference("label");
+		menuLabelPref.setSummary(alarm.getLabel());
 		menuLabelPref.setOnPreferenceChangeListener(
                 new Preference.OnPreferenceChangeListener() {
                     public boolean onPreferenceChange(Preference p,
@@ -67,9 +94,15 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
                     }
                 });
 		
+		
 		menuRepeat = (RepeatPreference) findPreference("setRepeat");
+		menuRepeat.setSummary(alarm.getDaysOfWeek().toString(getApplicationContext(), true));
 		
 		menuRingtone = (RingtonePreference) findPreference("ringtone");
+		menuRingtone.setSummary(RingtoneManager.getRingtone(
+								getApplicationContext(),
+								alarm.getAlert()).getTitle(
+								getApplicationContext()));
 		menuRingtone.setOnPreferenceChangeListener(new RingtonePreference.OnPreferenceChangeListener() {
                     public boolean onPreferenceChange(Preference p,
                             Object newValue) {
@@ -83,7 +116,72 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
                 });
 		
 		menuVibrate = (CheckBoxPreference) findPreference("vibrate");
+		menuVibrate.setChecked(alarm.isVibrate());
 		alarmDAO = new AlarmDAO(this);
+		
+		// We have to do this to get the save/cancel buttons to highlight on
+        // their own.
+        getListView().setItemsCanFocus(true);
+
+        // Grab the content view so we can modify it.
+        FrameLayout content = (FrameLayout) getWindow().getDecorView()
+                .findViewById(android.R.id.content);
+
+        // Get the main ListView and remove it from the content view.
+        ListView lv = getListView();
+        content.removeView(lv);
+
+        // Create the new LinearLayout that will become the content view and
+        // make it vertical.
+        LinearLayout ll = new LinearLayout(this);
+        ll.setOrientation(LinearLayout.VERTICAL);
+
+        // Have the ListView expand to fill the screen minus the save/cancel
+        // buttons.
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT);
+        lp.weight = 1;
+        ll.addView(lv, lp);
+
+        // Inflate the buttons onto the LinearLayout.
+        View v = LayoutInflater.from(this).inflate(
+                R.layout.alarm_save_cancel, ll);
+
+        // Attach actions to each button.
+        buttonAcept = (Button) v.findViewById(R.id.alarm_save);
+        buttonAcept.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    // Enable the alarm when clicking "Done"
+                    //mEnabled = true;
+                	acceptSettedAlarm();
+                    finish();
+                }
+        });
+       
+        
+        buttonCancel = (Button) v.findViewById(R.id.alarm_cancel);
+        buttonCancel.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    finish();
+                }
+        });
+        buttonCancel.setEnabled(false);
+        
+        buttonDelete = (Button) v.findViewById(R.id.alarm_delete);
+        buttonDelete.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+			   deleteAlarm(alarm);
+		       finish();
+			}
+		});
+        // Replace the old content view with our new one.
+        setContentView(ll);
+		
+		 
+		
 	}
 	
 	/*@SuppressWarnings("deprecation")
@@ -102,12 +200,23 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
 	    getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
 	}*/
 
+	protected void deleteAlarm(Alarm alarm) {
+		// TODO Auto-generated method stub
+		alarmDAO.deleteAlarm(alarm.getId());
+		removeAlarmFromManager(alarm);
+	}
+	
+	private void removeAlarmFromManager(Alarm alarm){
+		PendingIntent alarmIntent = composePendingAlarmIntent(alarm);
+		alarmMgr.cancel(alarmIntent);
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		return super.onCreateOptionsMenu(menu);
 	}
-
-	public void setAlarm(Alarm alarm) {
+	
+	public PendingIntent composePendingAlarmIntent(Alarm alarm){
 		alarm.setAlarmFormat(AlarmFormat.HOUR_24);
 		alarmMgr = (AlarmManager) getSystemService(Activity.ALARM_SERVICE);
 		Intent intent = new Intent(this, AlarmReceiverActivity.class);
@@ -116,7 +225,19 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
 		//intent.putExtra(name, value)
 		PendingIntent alarmIntent = PendingIntent.getActivity(this, Integer.parseInt(alarm.getHour() + "" + alarm.getMinutes()), intent,
 				PendingIntent.FLAG_CANCEL_CURRENT);
+		return alarmIntent;
+	}
 
+	public void setAlarm(Alarm alarm) {
+		/*alarm.setAlarmFormat(AlarmFormat.HOUR_24);
+		alarmMgr = (AlarmManager) getSystemService(Activity.ALARM_SERVICE);
+		Intent intent = new Intent(this, AlarmReceiverActivity.class);
+		intent.putExtra(AlarmEntry.COLUMN_NAME_ALERT,alarm.getAlert().toString());
+		intent.putExtra("Alarm",alarm);
+		//intent.putExtra(name, value)
+		PendingIntent alarmIntent = PendingIntent.getActivity(this, Integer.parseInt(alarm.getHour() + "" + alarm.getMinutes()), intent,
+				PendingIntent.FLAG_CANCEL_CURRENT);*/
+		PendingIntent alarmIntent = composePendingAlarmIntent(alarm);
 		// Set the alarm to start at
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(System.currentTimeMillis());
@@ -162,17 +283,21 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
         }
         
         //menuLabelPref.setSummary(menuLabelPref.getText());
-
+        buttonCancel.setEnabled(true);
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
 		
 	public void saveAlarm(Alarm alarm){
-		alarmDAO.createAlarm(alarm);
+		if(alarm.getId() == 0){
+			alarmDAO.createAlarm(alarm);
+		}else{
+			alarmDAO.update(alarm);
+		}
 	}
 	
 	@Override
 	public void onBackPressed() {
-		acceptSettedAlarm();
+		//acceptSettedAlarm();
 		alarmDAO.close();
 		super.onBackPressed();
 	}
@@ -185,10 +310,13 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		String strRingtonePreference = prefs.getString("ringtone", "DEFAULT_RINGTONE_URI");
 		Uri ringtoneUri = Uri.parse(strRingtonePreference);
-		alarm.setAlert(ringtoneUri);
+		if(ringtoneUri.toString() != "DEFAULT_RINGTONE_URI"){
+			alarm.setAlert(ringtoneUri);
+		}
 		alarm.setVibrate(menuVibrate.isChecked());
 		setAlarm(alarm);
 		saveAlarm(alarm);
+		alarmDAO.close();
 	}
 
 	/*@Override

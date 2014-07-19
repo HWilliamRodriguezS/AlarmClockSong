@@ -53,7 +53,44 @@
        
    </LinearLayout>
    
+   <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <Button android:text="submit" 
+            android:id="@+id/Button" 
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true">
+        </Button>
+        <EditText android:id="@+id/EditText" 
+            android:layout_width="match_parent" 
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/Button"
+            android:layout_alignParentBottom="true">
+        </EditText>
+    </RelativeLayout>  
      
-     
+<!--    <RelativeLayout  -->
+<!--         android:id="@+id/InnerRelativeLayout" -->
+<!--         android:layout_width="wrap_content" -->
+<!--         android:layout_height="wrap_content" -->
+<!--         android:layout_alignParentBottom="true" > -->
 
+<!--         <Button  -->
+<!--             android:text="Enviar"  -->
+<!--             android:id="@+id/Button" -->
+<!--             android:layout_alignParentRight="true"  -->
+<!--             android:layout_width="wrap_content" -->
+<!--             android:layout_height="wrap_content"> -->
+<!--         </Button> -->
+
+<!--         <EditText  -->
+<!--             android:id="@+id/EditText"  -->
+<!--             android:layout_width="fill_parent" -->
+<!--             android:layout_toLeftOf="@id/Button" -->
+<!--             android:layout_height="wrap_content"> -->
+<!--         </EditText> -->
+
+<!--     </RelativeLayout> -->
 </LinearLayout>

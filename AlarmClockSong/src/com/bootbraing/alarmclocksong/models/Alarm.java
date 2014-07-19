@@ -16,9 +16,9 @@ public class Alarm implements Parcelable {
 
 	private int id = 0;
 	private boolean enabled = false;
-	private int hour = 0;
+	private int hour = 7;
 	private int minutes = 0;
-	private DaysOfWeek daysOfWeek = getDaysOfWeek();
+	private DaysOfWeek daysOfWeek = new DaysOfWeek(0);
 	private long time = 0;
 	private boolean vibrate = false;
 	private String label = "";
