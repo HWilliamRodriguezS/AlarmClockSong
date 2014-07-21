@@ -55,6 +55,10 @@
     <string name="stop_alarm" >Stop Alarm</string>
     
     <string name="time_7_am" >7:00</string>
+    
     <string name="snooze_alarm" >Snooze duration</string>
+    
+    <string name="random_ringtone">Random Ringtone</string>
+    
     
 </resources>

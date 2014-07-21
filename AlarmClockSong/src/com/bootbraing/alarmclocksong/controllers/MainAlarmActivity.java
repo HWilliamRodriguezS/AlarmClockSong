@@ -126,6 +126,7 @@ public class MainAlarmActivity extends Activity {
 			Log.d("Alarm Label","Alarm Label : " + alrm.getLabel() );
 			Log.d("Alarm Days","Alarm Days : " + alrm.getDaysOfWeek().toString(this, false));
 			Log.d("Alarm Ringtone","Alarm Ringtone : " + alrm.getAlert().toString());
+			Log.d("Alarm Random","Alarm Random : " + alrm.isRandomRingtone());
 			Log.d("=====","======");
 			//Log.d(" ","");
 

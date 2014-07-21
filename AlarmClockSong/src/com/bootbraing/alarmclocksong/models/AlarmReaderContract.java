@@ -22,6 +22,7 @@ public class AlarmReaderContract {
         public static final String COLUMN_NAME_LABEL = "label";
         public static final String COLUMN_NAME_ALERT = "alert";
         public static final String COLUMN_NAME_SILENT = "silent";
+        public static final String COLUMN_NAME_RANDOM = "random_alert";
         
 	}
 

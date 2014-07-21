@@ -78,6 +78,7 @@ public final class R {
         public static final int label=0x7f07000d;
         public static final int never=0x7f07000c;
         public static final int preferences=0x7f070011;
+        public static final int random_ringtone=0x7f070019;
         public static final int revert=0x7f07000f;
         public static final int ringtone=0x7f07000a;
         public static final int select_days=0x7f070007;

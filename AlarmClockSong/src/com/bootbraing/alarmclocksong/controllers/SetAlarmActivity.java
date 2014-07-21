@@ -29,7 +29,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.bootbraing.alarmclocksong.R;
 import com.bootbraing.alarmclocksong.dao.AlarmDAO;
@@ -50,6 +49,7 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
 	private RepeatPreference menuRepeat;
 	private RingtonePreference menuRingtone;
 	private CheckBoxPreference menuVibrate;
+	private CheckBoxPreference menuRandomRington;
 	
 	private Button buttonCancel;
 	private Button buttonAcept;
@@ -73,11 +73,11 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
 	    Alarm editAlarm = (Alarm) intent.getParcelableExtra("Alarm");
 	    if(editAlarm != null){
 	    	 this.alarm = editAlarm;
-	    	 Toast.makeText(getApplicationContext(),"Extra Receibed : " + editAlarm , Toast.LENGTH_LONG).show();
+	    	 //Toast.makeText(getApplicationContext(),"Extra Receibed : " + editAlarm , Toast.LENGTH_LONG).show();
 	    }else{
 //	    	alarm.setAlert(Settings.System.DEFAULT_ALARM_ALERT_URI);
 	    	alarm.setAlert(Settings.System.DEFAULT_ALARM_ALERT_URI);
-	    	Toast.makeText(getApplicationContext(),"Extra Not Receibed : " + alarm , Toast.LENGTH_LONG).show();
+	    	//Toast.makeText(getApplicationContext(),"Extra Not Receibed : " + alarm , Toast.LENGTH_LONG).show();
 	    }
 	    alarm.setAlarmFormat(AlarmFormat.HOUR_12);
 		menuTimePref = findPreference("time");
@@ -117,6 +117,10 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
 		
 		menuVibrate = (CheckBoxPreference) findPreference("vibrate");
 		menuVibrate.setChecked(alarm.isVibrate());
+		
+		menuRandomRington = (CheckBoxPreference) findPreference("random");
+		menuRandomRington.setChecked(alarm.isRandomRingtone());
+		
 		alarmDAO = new AlarmDAO(this);
 		
 		// We have to do this to get the save/cancel buttons to highlight on
@@ -314,6 +318,7 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
 			alarm.setAlert(ringtoneUri);
 		}
 		alarm.setVibrate(menuVibrate.isChecked());
+		alarm.setRandomRingtone(menuRandomRington.isChecked());
 		setAlarm(alarm);
 		saveAlarm(alarm);
 		alarmDAO.close();

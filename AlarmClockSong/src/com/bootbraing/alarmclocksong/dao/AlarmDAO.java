@@ -33,7 +33,7 @@ public class AlarmDAO {
 				AlarmEntry.COLUMN_NAME_MINUTES, AlarmEntry.COLUMN_NAME_TIME,
 				AlarmEntry.COLUMN_NAME_VIBRATE, AlarmEntry.COLUMN_NAME_LABEL,
 				AlarmEntry.COLUMN_NAME_ALERT, AlarmEntry.COLUMN_NAME_SILENT,
-				AlarmEntry.COLUMN_NAME_DAYSOFWEEK};
+				AlarmEntry.COLUMN_NAME_DAYSOFWEEK,AlarmEntry.COLUMN_NAME_RANDOM};
 		Cursor cursor = db.query(AlarmEntry.TABLE_NAME, tableColumns,
 				AlarmEntry._ID + "=?",
 				new String[] { String.valueOf(alarmId) }, null, null, null,
@@ -53,6 +53,8 @@ public class AlarmDAO {
 		alarm.setAlert(Uri.parse(cursor.getString(8)));
 		alarm.setSilent((cursor.getInt(9) == 1) ? true : false);
 		alarm.setDaysOfWeek(new Alarm.DaysOfWeek(cursor.getInt(10)));
+		alarm.setRandomRingtone((cursor.getInt(11) == 1) ? true : false);
+		
 		}
 		
 		return alarm;
@@ -75,6 +77,7 @@ public class AlarmDAO {
 		contentValues.put(AlarmEntry.COLUMN_NAME_ALERT, alarm.getAlert().toString());
 		contentValues.put(AlarmEntry.COLUMN_NAME_SILENT, alarm.isSilent() ? 1: 0);
 		contentValues.put(AlarmEntry.COLUMN_NAME_DAYSOFWEEK,alarm.getDaysOfWeek().getCoded());
+		contentValues.put(AlarmEntry.COLUMN_NAME_RANDOM, alarm.isRandomRingtone() ? 1 : 0);
 		// Insert into DB
 		db.insert("alarms", null, contentValues);
 	}
@@ -106,7 +109,7 @@ public class AlarmDAO {
 				AlarmEntry.COLUMN_NAME_MINUTES,	AlarmEntry.COLUMN_NAME_TIME,
 				AlarmEntry.COLUMN_NAME_VIBRATE, AlarmEntry.COLUMN_NAME_LABEL,
 				AlarmEntry.COLUMN_NAME_ALERT  , AlarmEntry.COLUMN_NAME_SILENT, 
-				AlarmEntry.COLUMN_NAME_DAYSOFWEEK};
+				AlarmEntry.COLUMN_NAME_DAYSOFWEEK,AlarmEntry.COLUMN_NAME_RANDOM};
 
 		// Query the database
 		Cursor cursor = db.query("alarms", tableColumns, null, null, null,
@@ -128,6 +131,7 @@ public class AlarmDAO {
 			alarm.setAlert(Uri.parse(cursor.getString(8)));
 			alarm.setSilent((cursor.getInt(9) == 1) ? true : false);
 			alarm.setDaysOfWeek(new Alarm.DaysOfWeek(cursor.getInt(10)));
+			alarm.setRandomRingtone((cursor.getInt(11) == 1) ? true : false);
 			alarmList.add(alarm);
 
 			cursor.moveToNext();
@@ -148,6 +152,7 @@ public class AlarmDAO {
 		contentValues.put(AlarmEntry.COLUMN_NAME_ALERT, alarm.getAlert().toString());
 		contentValues.put(AlarmEntry.COLUMN_NAME_SILENT, alarm.isSilent() ? 1: 0);
 		contentValues.put(AlarmEntry.COLUMN_NAME_DAYSOFWEEK,alarm.getDaysOfWeek().getCoded());
+		contentValues.put(AlarmEntry.COLUMN_NAME_RANDOM, alarm.isRandomRingtone() ? 1 : 0 );
 		
 		// updating row
 		return db.update(AlarmEntry.TABLE_NAME, 

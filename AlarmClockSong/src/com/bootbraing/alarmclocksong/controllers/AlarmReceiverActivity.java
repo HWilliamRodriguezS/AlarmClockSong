@@ -2,6 +2,8 @@ package com.bootbraing.alarmclocksong.controllers;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Random;
 
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -9,8 +11,10 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -84,6 +88,30 @@ public class AlarmReceiverActivity extends Activity {
         
     }
     
+    public Uri getRandomRingtone(){
+    	
+    	
+    	RingtoneManager ringtoneMgr = new RingtoneManager(this);
+    	Uri[] allRingtones ;
+    	
+    	
+    	ringtoneMgr.setType(RingtoneManager.TYPE_ALARM);
+    	Cursor alarmsCursor = ringtoneMgr.getCursor();
+    	int alarmsCount = alarmsCursor.getCount();
+    	if (alarmsCount == 0 && !alarmsCursor.moveToFirst()) {
+    	   return null;
+    	}
+    	Uri[] alarms = new Uri[alarmsCount];
+    	while(!alarmsCursor.isAfterLast() && alarmsCursor.moveToNext()) {
+    	    int currentPosition = alarmsCursor.getPosition();
+    	    alarms[currentPosition] = ringtoneMgr.getRingtoneUri(currentPosition);
+    	}
+    	//Toast.makeText(getApplicationContext()," Ringtones : " + alarms[1] + " Random number :  " +  new Random(alarms.length).nextInt(alarms.length) , Toast.LENGTH_LONG).show();
+    	alarmsCursor.close();
+    	//new Date().getTime();
+    	return alarms[new Random(new Date().getTime()).nextInt(alarms.length)];
+    }
+    
     @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -126,6 +154,11 @@ public class AlarmReceiverActivity extends Activity {
             	alarm.setAlert(Settings.System.DEFAULT_ALARM_ALERT_URI);
             }
         }
+        
+        if(alarm.isRandomRingtone()){
+        	alarm.setAlert(getRandomRingtone());
+        }
+        
         return alarm.getAlert();
     }
     

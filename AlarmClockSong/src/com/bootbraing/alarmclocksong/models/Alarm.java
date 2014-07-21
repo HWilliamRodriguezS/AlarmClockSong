@@ -3,6 +3,7 @@ package com.bootbraing.alarmclocksong.models;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Random;
 
 import android.content.Context;
 import android.net.Uri;
@@ -25,6 +26,7 @@ public class Alarm implements Parcelable {
 	private Uri alert = Uri.parse("");
 	private boolean silent = false;
 	private AlarmFormat alarmFormat = AlarmFormat.HOUR_24;
+	private boolean randomRingtone ;
 	
 	public Alarm(){
 		
@@ -32,7 +34,7 @@ public class Alarm implements Parcelable {
 	
 	public Alarm(int id, boolean enabled, int hour, int minutes,
 			DaysOfWeek daysOfWeek, long time, boolean vibrate, String label,
-			Uri alert, boolean silent) {
+			Uri alert, boolean silent ,boolean randomRingtone) {
 		super();
 		this.id = id;
 		this.enabled = enabled;
@@ -45,6 +47,7 @@ public class Alarm implements Parcelable {
 		this.alert = alert;
 		this.silent = silent;
 		this.alarmFormat = AlarmFormat.HOUR_24;
+		this.randomRingtone = randomRingtone;
 	}
 	
 	public Alarm(Parcel in) {
@@ -59,6 +62,7 @@ public class Alarm implements Parcelable {
 		label = in.readString();
 	    alert = Uri.parse(in.readString());
 		silent = (in.readInt() == 1)?true:false;
+		randomRingtone = (in.readInt() == 1)?true:false;
 	}
 
 	public int getId() {
@@ -317,8 +321,17 @@ public class Alarm implements Parcelable {
 		dest.writeString(label);
 		dest.writeString(alert.toString());
 		dest.writeInt(silent?1:0);
+		dest.writeInt(randomRingtone?1:0);
 	}
 	
+	public boolean isRandomRingtone() {
+		return randomRingtone;
+	}
+
+	public void setRandomRingtone(boolean randomRingtone) {
+		this.randomRingtone = randomRingtone;
+	}
+
 	public static final Parcelable.Creator<Alarm> CREATOR = new Parcelable.Creator<Alarm>() {
         public Alarm createFromParcel(Parcel in) {
             return new Alarm(in);

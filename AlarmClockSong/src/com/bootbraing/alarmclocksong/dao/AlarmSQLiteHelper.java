@@ -29,7 +29,8 @@ public class AlarmSQLiteHelper extends SQLiteOpenHelper {
 			+ AlarmEntry.COLUMN_NAME_VIBRATE + TEXT_TYPE + COMMA_SEP 
 			+ AlarmEntry.COLUMN_NAME_LABEL + TEXT_TYPE + COMMA_SEP 
 			+ AlarmEntry.COLUMN_NAME_ALERT + TEXT_TYPE + COMMA_SEP
-			+ AlarmEntry.COLUMN_NAME_SILENT + TEXT_TYPE +
+			+ AlarmEntry.COLUMN_NAME_SILENT + TEXT_TYPE + COMMA_SEP
+			+ AlarmEntry.COLUMN_NAME_RANDOM + INTEGER_TYPE +   
 			// Any other options for the CREATE command
 			" )";
 
