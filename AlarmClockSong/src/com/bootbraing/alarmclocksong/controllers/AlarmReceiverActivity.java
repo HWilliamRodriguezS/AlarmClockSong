@@ -1,8 +1,10 @@
 package com.bootbraing.alarmclocksong.controllers;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 import android.app.Activity;
@@ -88,29 +90,80 @@ public class AlarmReceiverActivity extends Activity {
         
     }
     
-    public Uri getRandomRingtone(){
+    /*public Uri getRandomRingtone(){
     	
+		RingtoneManager ringtoneMgr = new RingtoneManager(this);
+		Uri[] allRingtones ;
+		List<Uri> listRingtones = new ArrayList<Uri>();
+		int[] params = { 0, 1, 2 };
+		int ringTypes[] = {RingtoneManager.TYPE_ALARM,RingtoneManager.TYPE_RINGTONE,RingtoneManager.TYPE_NOTIFICATION};
+		//int var = RingtoneManager.TYPE_ALARM;
+		for (int param : params) {
+
+			switch (param) {
+			
+			case 0:
+
+				break;
+			case 1:
+				ringtoneMgr.setType(ringTypes[param]);
+				Cursor alarmsCursor = ringtoneMgr.getCursor();
+				int alarmsCount = alarmsCursor.getCount();
+				if (alarmsCount == 0 && !alarmsCursor.moveToFirst()) {
+					return null;
+				}
+				
+				Uri[] alarms = new Uri[alarmsCount];
+				while (!alarmsCursor.isAfterLast() && alarmsCursor.moveToNext()) {
+					int currentPosition = alarmsCursor.getPosition();
+					//alarms[currentPosition] = ringtoneMgr.getRingtoneUri(currentPosition);
+					//listRingtones.add(ringtoneMgr.getRingtonePosition(currentPosition));
+					listRingtones.add(ringtoneMgr.getRingtoneUri(currentPosition));
+				}
+				
+				alarmsCursor.close();
+				break;
+				
+			case 2:
+				break;
+			default:
+				
+			}
+
+		}
+		allRingtones = new Uri[listRingtones.size()];
+		listRingtones.toArray(allRingtones);
+		Toast.makeText(getApplicationContext(), "Size : " + listRingtones.size() + " Data"  + listRingtones, Toast.LENGTH_LONG ).show();
+		return allRingtones[new Random(new Date().getTime()).nextInt(allRingtones.length)];
+	}*/
+    
+public Uri getRandomRingtone(){
     	
-    	RingtoneManager ringtoneMgr = new RingtoneManager(this);
-    	Uri[] allRingtones ;
-    	
-    	
-    	ringtoneMgr.setType(RingtoneManager.TYPE_ALARM);
-    	Cursor alarmsCursor = ringtoneMgr.getCursor();
-    	int alarmsCount = alarmsCursor.getCount();
-    	if (alarmsCount == 0 && !alarmsCursor.moveToFirst()) {
-    	   return null;
-    	}
-    	Uri[] alarms = new Uri[alarmsCount];
-    	while(!alarmsCursor.isAfterLast() && alarmsCursor.moveToNext()) {
-    	    int currentPosition = alarmsCursor.getPosition();
-    	    alarms[currentPosition] = ringtoneMgr.getRingtoneUri(currentPosition);
-    	}
-    	//Toast.makeText(getApplicationContext()," Ringtones : " + alarms[1] + " Random number :  " +  new Random(alarms.length).nextInt(alarms.length) , Toast.LENGTH_LONG).show();
-    	alarmsCursor.close();
-    	//new Date().getTime();
-    	return alarms[new Random(new Date().getTime()).nextInt(alarms.length)];
-    }
+		//RingtoneManager ringtoneMgr = new RingtoneManager(this);
+		Uri[] allRingtones ;
+		List<Uri> listRingtones = new ArrayList<Uri>();
+		int ringTypes[] = {RingtoneManager.TYPE_ALARM,RingtoneManager.TYPE_RINGTONE,RingtoneManager.TYPE_NOTIFICATION};
+		
+		for (int ringType : ringTypes) {
+			RingtoneManager ringtoneMgr = new RingtoneManager(this);
+			ringtoneMgr.setType(ringType);
+			Cursor alarmsCursor = ringtoneMgr.getCursor();
+			if (alarmsCursor.getCount() == 0 && !alarmsCursor.moveToFirst()) {
+				return null;
+			}
+			
+			while (!alarmsCursor.isAfterLast() && alarmsCursor.moveToNext()) {
+				listRingtones.add(ringtoneMgr.getRingtoneUri(alarmsCursor.getPosition()));
+			}
+			
+			alarmsCursor.close();
+			
+
+		}
+		allRingtones = new Uri[listRingtones.size()];
+		listRingtones.toArray(allRingtones);
+		return allRingtones[new Random(new Date().getTime()).nextInt(allRingtones.length)];
+	}
     
     @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -156,7 +209,10 @@ public class AlarmReceiverActivity extends Activity {
         }
         
         if(alarm.isRandomRingtone()){
-        	alarm.setAlert(getRandomRingtone());
+        	Uri tmpRing = getRandomRingtone();
+        	if(tmpRing != null){
+        	  alarm.setAlert(tmpRing);
+        	}
         }
         
         return alarm.getAlert();
