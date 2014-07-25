@@ -88,6 +88,7 @@ public final class R {
         public static final int silence=0x7f070012;
         public static final int snooze_alarm=0x7f070018;
         public static final int stop_alarm=0x7f070016;
+        public static final int submit=0x7f07001a;
         /**  Text displayed for the text in the Set Alarm Screen to ask the time  
          */
         public static final int time=0x7f070004;

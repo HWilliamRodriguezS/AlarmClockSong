@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import android.app.Activity;
@@ -21,6 +22,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.Menu;
 import android.view.MotionEvent;
@@ -39,7 +41,6 @@ import com.bootbraing.alarmclocksong.models.AlarmReaderContract.AlarmEntry;
 public class AlarmReceiverActivity extends Activity {
 
 	private MediaPlayer mMediaPlayer; 
-	//private Uri alert;
 	private Alarm alarm;
 	private Vibrator vibratorPlayer;
 	
@@ -53,8 +54,6 @@ public class AlarmReceiverActivity extends Activity {
         Intent intent = getIntent();
         alarm = (Alarm) intent.getParcelableExtra("Alarm");
         vibratorPlayer = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        //Log.d("Reicibing Parceable Object" ,"Pareable Alarm : " + alarm);
-        //alert =Uri.parse(intent.getStringExtra(AlarmEntry.COLUMN_NAME_ALERT));
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -72,79 +71,30 @@ public class AlarmReceiverActivity extends Activity {
         snoozeAlarm.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				Toast.makeText(getApplicationContext(),"Got clicked", Toast.LENGTH_SHORT).show();
+				//Toast.makeText(getApplicationContext(),"Got clicked", Toast.LENGTH_SHORT).show();
 				snoozeAlarm();
 				stopAlarm();
 				
 			}
 		});
         
-        
         playSound(this, getAlarmUri());
-        turnVibratorOn(true);
         
-//        SharedPreferences prefs = getApplicationContext().getSharedPreferences("AlarmClockSong", 0);
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-//        float volumen = prefs.getFloat("volumen", 0.125f);
-//        Toast.makeText(getApplicationContext(), "Is this the setted volumen ?" + volumen, Toast.LENGTH_LONG).show();
-        
+        if(alarm.isVibrate()){
+            turnVibratorOn(true);
+        }
     }
     
-    /*public Uri getRandomRingtone(){
-    	
-		RingtoneManager ringtoneMgr = new RingtoneManager(this);
-		Uri[] allRingtones ;
-		List<Uri> listRingtones = new ArrayList<Uri>();
-		int[] params = { 0, 1, 2 };
-		int ringTypes[] = {RingtoneManager.TYPE_ALARM,RingtoneManager.TYPE_RINGTONE,RingtoneManager.TYPE_NOTIFICATION};
-		//int var = RingtoneManager.TYPE_ALARM;
-		for (int param : params) {
-
-			switch (param) {
-			
-			case 0:
-
-				break;
-			case 1:
-				ringtoneMgr.setType(ringTypes[param]);
-				Cursor alarmsCursor = ringtoneMgr.getCursor();
-				int alarmsCount = alarmsCursor.getCount();
-				if (alarmsCount == 0 && !alarmsCursor.moveToFirst()) {
-					return null;
-				}
-				
-				Uri[] alarms = new Uri[alarmsCount];
-				while (!alarmsCursor.isAfterLast() && alarmsCursor.moveToNext()) {
-					int currentPosition = alarmsCursor.getPosition();
-					//alarms[currentPosition] = ringtoneMgr.getRingtoneUri(currentPosition);
-					//listRingtones.add(ringtoneMgr.getRingtonePosition(currentPosition));
-					listRingtones.add(ringtoneMgr.getRingtoneUri(currentPosition));
-				}
-				
-				alarmsCursor.close();
-				break;
-				
-			case 2:
-				break;
-			default:
-				
-			}
-
-		}
-		allRingtones = new Uri[listRingtones.size()];
-		listRingtones.toArray(allRingtones);
-		Toast.makeText(getApplicationContext(), "Size : " + listRingtones.size() + " Data"  + listRingtones, Toast.LENGTH_LONG ).show();
-		return allRingtones[new Random(new Date().getTime()).nextInt(allRingtones.length)];
-	}*/
+public Uri getRandomRingtone(int[] ringTypes){
     
-public Uri getRandomRingtone(){
-    	
-		//RingtoneManager ringtoneMgr = new RingtoneManager(this);
 		Uri[] allRingtones ;
 		List<Uri> listRingtones = new ArrayList<Uri>();
-		int ringTypes[] = {RingtoneManager.TYPE_ALARM,RingtoneManager.TYPE_RINGTONE,RingtoneManager.TYPE_NOTIFICATION};
+		//int ringTypes[] = {RingtoneManager.TYPE_ALARM,RingtoneManager.TYPE_RINGTONE,RingtoneManager.TYPE_NOTIFICATION,1024};
 		
 		for (int ringType : ringTypes) {
+			
+			if(ringType == 1024){continue;}
+			
 			RingtoneManager ringtoneMgr = new RingtoneManager(this);
 			ringtoneMgr.setType(ringType);
 			Cursor alarmsCursor = ringtoneMgr.getCursor();
@@ -158,8 +108,39 @@ public Uri getRandomRingtone(){
 			
 			alarmsCursor.close();
 			
-
 		}
+		
+		/* Ending */
+		//Some audio may be explicitly marked as not being music
+		String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
+
+		String[] projection = {
+		        MediaStore.Audio.Media._ID,
+		        MediaStore.Audio.Media.ARTIST,
+		        MediaStore.Audio.Media.TITLE,
+		        MediaStore.Audio.Media.DATA,
+		        MediaStore.Audio.Media.DISPLAY_NAME,
+		        MediaStore.Audio.Media.DURATION
+		};
+
+		@SuppressWarnings("deprecation")
+		Cursor cursor = this.managedQuery(
+		        MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+		        projection,
+		        selection,
+		        null,
+		        null);
+		//listRingtones = new ArrayList<Uri>();
+		List<String> songs = new ArrayList<String>();
+		while(cursor.moveToNext()){
+		        songs.add(cursor.getString(3) );
+		        //Uri uriSong= Uri.parse("");
+		        listRingtones.add(Uri.parse(cursor.getString(3)));
+		}
+		
+		
+		/* Ending */
+		//Toast.makeText(getApplicationContext(),"Music : " + songs,Toast.LENGTH_LONG).show();
 		allRingtones = new Uri[listRingtones.size()];
 		listRingtones.toArray(allRingtones);
 		return allRingtones[new Random(new Date().getTime()).nextInt(allRingtones.length)];
@@ -209,8 +190,41 @@ public Uri getRandomRingtone(){
         }
         
         if(alarm.isRandomRingtone()){
-        	Uri tmpRing = getRandomRingtone();
-        	if(tmpRing != null){
+        	
+        	
+        	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        	Map<String,?> soundList = prefs.getAll();
+        	String str ;//= soundList.get("soundList").toString();
+        	int[] values = null;
+			if (soundList.get("soundList") != null && soundList.get("soundList") != "") {
+				str = soundList.get("soundList").toString();
+				String[] splited = null;
+				splited = str.split("\\s+");
+				values = new int[splited.length];
+				
+				for (int i = 0; i < splited.length; i++) {
+					// {"Ringtones","Alerts","Notifications","MusicLibrary"};
+					// {RingtoneManager.TYPE_ALARM,RingtoneManager.TYPE_RINGTONE,RingtoneManager.TYPE_NOTIFICATION,1024};
+					values[i] = (splited[i].equals("Ringtones")) ? RingtoneManager.TYPE_ALARM
+							: 256;
+					values[i] = (splited[i].equals("Alerts")) ? RingtoneManager.TYPE_RINGTONE
+							: values[i];
+					values[i] = (splited[i].equals("Notifications")) ? RingtoneManager.TYPE_NOTIFICATION
+							: values[i];
+					values[i] = (splited[i].equals("MusicLibrary")) ? 1024
+							: values[i];
+					Toast.makeText(getApplicationContext()," Value :  " + splited[i],Toast.LENGTH_LONG).show();
+				}
+				//Toast.makeText(getApplicationContext(),	" lenght : " + values.length + " , and value : " + values[0], Toast.LENGTH_LONG).show();
+
+			}
+        	//Object eo = soundList.get("soundList");
+        	//Toast.makeText(getApplicationContext()," Prefs " + soundList,Toast.LENGTH_LONG).show();
+        	//Log.d("Prefs " , "Prefs :" + soundList.get("soundList"));
+        	
+        	if(values != null){
+        		//Toast.makeText(getApplicationContext()," Inside ",Toast.LENGTH_LONG).show();
+        		Uri tmpRing = getRandomRingtone(values);
         	  alarm.setAlert(tmpRing);
         	}
         }

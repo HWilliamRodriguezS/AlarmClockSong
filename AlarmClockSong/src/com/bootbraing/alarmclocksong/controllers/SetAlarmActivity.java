@@ -103,9 +103,11 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
 								getApplicationContext(),
 								alarm.getAlert()).getTitle(
 								getApplicationContext()));
+	
 		menuRingtone.setOnPreferenceChangeListener(new RingtonePreference.OnPreferenceChangeListener() {
                     public boolean onPreferenceChange(Preference p,
                             Object newValue) {
+
 						String name = RingtoneManager.getRingtone(
 								getApplicationContext(),
 								Uri.parse((String) newValue)).getTitle(
@@ -113,6 +115,7 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
                         p.setSummary((String) name);
                         return true;
                     }
+                    
                 });
 		
 		menuVibrate = (CheckBoxPreference) findPreference("vibrate");
