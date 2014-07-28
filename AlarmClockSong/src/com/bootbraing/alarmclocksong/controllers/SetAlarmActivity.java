@@ -250,10 +250,47 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
 		calendar.setTimeInMillis(System.currentTimeMillis());
 		calendar.set(Calendar.HOUR_OF_DAY, alarm.getHour());
 		calendar.set(Calendar.MINUTE, alarm.getMinutes());
+		calendar.set(Calendar.SECOND, 0);
+	    calendar.set(Calendar.MILLISECOND, 0);
+		String days = Integer.toBinaryString(alarm.getDaysOfWeek().getCoded());
+		
+		char[] daysC = days.toCharArray();
+		
+		for(int i = daysC.length ,iday=1 ; i > 0 ; i--,iday++){
+			if(iday == 7 ){
+				calendar.set(Calendar.DAY_OF_WEEK,(1));
+			}else{
+				calendar.set(Calendar.DAY_OF_WEEK,(1+i));
+			}
+			
+			if(calendar.getTimeInMillis() <= System.currentTimeMillis() ){
+				calendar.setTimeInMillis(calendar.getTimeInMillis() + (7*24*60*60*1000));
+			}
+			
+			if (daysC[i-1] == '1') {
+				Log.d("Alarm ","Setted : " + calendar.getTime());
+				alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
+						calendar.getTimeInMillis(), 7 * 24 * 60 * 60 * 1000,
+						alarmIntent);
+			}
+			
+		}
+		
+		/*/
+		calSet.set(Calendar.DAY_OF_WEEK, week);
+        calSet.set(Calendar.HOUR_OF_DAY, hour);
+        calSet.set(Calendar.MINUTE, minuts);
+        calSet.set(Calendar.SECOND, 0);
+        calSet.set(Calendar.MILLISECOND, 0);
 
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+                calSet.getTimeInMillis(), 1 * 60 * 60 * 1000, pendingIntent);
+     
+		 
+		 */
+		
 		// setRepeating() lets you specify a precise 
-		alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
-				calendar.getTimeInMillis(), 1000 * 60 * 60 * 24, alarmIntent);
+		//alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(), 1 * 24 * 60 * 60 * 1000, alarmIntent);
 
 	}
 

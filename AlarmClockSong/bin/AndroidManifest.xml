@@ -54,6 +54,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <activity 
+            android:name="com.bootbraing.alarmclocksong.controllers.AlarmNotificationBar"
+            android:label="Notification" 
+            android:launchMode="singleTop" >
+            
+            
+             <intent-filter>
+                <action android:name="android.intent.action.ALARM_NOTIFICATION" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
     </application>
 

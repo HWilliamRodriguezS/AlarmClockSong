@@ -25,22 +25,25 @@ public final class R {
         public static final int activity_vertical_margin=0x7f060001;
     }
     public static final class drawable {
-        public static final int alarm_clock_32=0x7f020000;
-        public static final int ic_alarm_clock_128=0x7f020001;
-        public static final int ic_alarm_clock_off_32=0x7f020002;
-        public static final int ic_alarm_clock_on_32=0x7f020003;
-        public static final int ic_launcher=0x7f020004;
+        public static final int alarm_clock_24=0x7f020000;
+        public static final int alarm_clock_32=0x7f020001;
+        public static final int ic_alarm_clock_128=0x7f020002;
+        public static final int ic_alarm_clock_off_32=0x7f020003;
+        public static final int ic_alarm_clock_on_32=0x7f020004;
+        public static final int ic_launcher=0x7f020005;
     }
     public static final class id {
         public static final int Button=0x7f0a0003;
         public static final int EditText=0x7f0a0004;
-        public static final int action_settings=0x7f0a000b;
+        public static final int action_settings=0x7f0a000c;
         public static final int addAlarm=0x7f0a0000;
         public static final int alarm_cancel=0x7f0a0008;
         public static final int alarm_delete=0x7f0a0009;
         public static final int alarm_save=0x7f0a0007;
-        public static final int seekBar1=0x7f0a000a;
+        public static final int notifications=0x7f0a000d;
+        public static final int seekBar1=0x7f0a000b;
         public static final int snoozeAlarm=0x7f0a0006;
+        public static final int stat=0x7f0a000a;
         public static final int stopAlarm=0x7f0a0005;
         public static final int tAlarms=0x7f0a0001;
         public static final int time=0x7f0a0002;
@@ -51,7 +54,8 @@ public final class R {
         public static final int alarm_on_off=0x7f030002;
         public static final int alarm_receiver=0x7f030003;
         public static final int alarm_save_cancel=0x7f030004;
-        public static final int volumen_seekbar=0x7f030005;
+        public static final int statusbar=0x7f030005;
+        public static final int volumen_seekbar=0x7f030006;
     }
     public static final class menu {
         public static final int main_alarm=0x7f090000;
@@ -77,6 +81,7 @@ public final class R {
         public static final int every_day=0x7f070008;
         public static final int label=0x7f07000d;
         public static final int never=0x7f07000c;
+        public static final int notification=0x7f07001b;
         public static final int preferences=0x7f070011;
         public static final int random_ringtone=0x7f070019;
         public static final int revert=0x7f07000f;

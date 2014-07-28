@@ -3,7 +3,6 @@ package com.bootbraing.alarmclocksong.models;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.Random;
 
 import android.content.Context;
 import android.net.Uri;

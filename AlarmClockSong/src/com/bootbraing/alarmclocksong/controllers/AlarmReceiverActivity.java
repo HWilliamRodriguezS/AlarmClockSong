@@ -10,6 +10,8 @@ import java.util.Random;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -25,9 +27,7 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.view.Menu;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -40,12 +40,16 @@ import com.bootbraing.alarmclocksong.models.AlarmReaderContract.AlarmEntry;
 
 public class AlarmReceiverActivity extends Activity {
 
+	private final int ALARM_RECEIVER_ACTIVITY = 1206070001;
+	
 	private MediaPlayer mMediaPlayer; 
 	private Alarm alarm;
 	private Vibrator vibratorPlayer;
 	
 	private Button stopAlarm;
 	private Button snoozeAlarm; 
+	
+	private NotificationManager notifMgr;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,13 +64,21 @@ public class AlarmReceiverActivity extends Activity {
         setContentView(R.layout.alarm_receiver);
  
         stopAlarm = (Button) findViewById(R.id.stopAlarm);
-        stopAlarm.setOnTouchListener(new OnTouchListener() {
+        stopAlarm.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				stopAlarm();
+				notifMgr.cancel(ALARM_RECEIVER_ACTIVITY);
+			}
+		});
+        /*stopAlarm.setOnTouchListener(new OnTouchListener() {
             public boolean onTouch(View arg0, MotionEvent arg1) {
             	stopAlarm();
                 return false;
             }
         });
-        
+        */
         snoozeAlarm = (Button)findViewById(R.id.snoozeAlarm);
         snoozeAlarm.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -83,9 +95,52 @@ public class AlarmReceiverActivity extends Activity {
         if(alarm.isVibrate()){
             turnVibratorOn(true);
         }
+        
+        notifMgr=  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        //Intent newIntent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        intent.setClass(this, AlarmReceiverActivity.class);
+        //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+        intent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pi = PendingIntent.getActivity(this, 0, intent,  PendingIntent.FLAG_UPDATE_CURRENT);
+        
+       
+        
+		String body = "The body of the notification";
+		String title = "Title Of Notification";
+		Notification n = new Notification(R.drawable.alarm_clock_24,body,System.currentTimeMillis());
+		n.setLatestEventInfo(this, title, body, pi);
+		n.defaults = Notification.DEFAULT_ALL;
+		notifMgr.notify(ALARM_RECEIVER_ACTIVITY,n);
+        
+        //Notification n = new Notification(R.drawable.alarm_clock_24,body,System.currentTimeMillis());
+        
+//        Intent notificationIntent = new Intent(Intent.ACTION_MAIN);
+//        notificationIntent.setClass(getApplicationContext(),AlarmReceiverActivity.class);
+//        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |Intent.FLAG_ACTIVITY_SINGLE_TOP);
+//        Notification n = new Notification(R.drawable.alarm_clock_24,body,System.currentTimeMillis());
+//	;
+//        
+//        PendingIntent notificationPendingIntent = PendingIntent.getActivity(this,
+//       		 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        
+//    	n.setLatestEventInfo(this, title, body, notificationPendingIntent);
+//		n.defaults = Notification.DEFAULT_ALL;
+//		notifMgr.notify(ALARM_RECEIVER_ACTIVITY,n);
+//        // notifMgr.
+
+        
+        
+        
     }
     
-public Uri getRandomRingtone(int[] ringTypes){
+    @Override
+	public void onBackPressed() {
+    	moveTaskToBack (true);
+	}
+
+	public Uri getRandomRingtone(int[] ringTypes){
     
 		Uri[] allRingtones ;
 		List<Uri> listRingtones = new ArrayList<Uri>();
@@ -264,6 +319,5 @@ public Uri getRandomRingtone(int[] ringTypes){
 				calendar.getTimeInMillis() + ((Integer.parseInt(snooze)) * 60 * 1000), 0, alarmIntent);
 		
 	}
-	
-	
+
 }

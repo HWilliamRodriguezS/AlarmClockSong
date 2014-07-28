@@ -50,8 +50,22 @@ public class MainAlarmActivity extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		
+		switch(item.getItemId()){
+		default:
+		case R.id.action_settings:
 		Intent i = new Intent(this, AlarmPreferences.class);
 		startActivityForResult(i, 10);
+		
+		
+		break;
+		
+		case R.id.notifications :
+			Intent i2 = new Intent(this, AlarmNotificationBar.class);
+			startActivityForResult(i2, 12);
+		break;
+		}
+		
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -127,6 +141,7 @@ public class MainAlarmActivity extends Activity {
 			Log.d("Alarm Days","Alarm Days : " + alrm.getDaysOfWeek().toString(this, false));
 			Log.d("Alarm Ringtone","Alarm Ringtone : " + alrm.getAlert().toString());
 			Log.d("Alarm Random","Alarm Random : " + alrm.isRandomRingtone());
+			Log.d("Alarm Repeating" , "Days : " + Integer.toBinaryString(alrm.getDaysOfWeek().getCoded()));
 			Log.d("=====","======");
 			//Log.d(" ","");
 
