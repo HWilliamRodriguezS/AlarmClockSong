@@ -1,6 +1,8 @@
 package com.bootbraing.alarmclocksong.controllers;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -65,6 +67,8 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
 		addPreferencesFromResource(R.xml.set_alarm_prefs);
 	    PreferenceManager.setDefaultValues(SetAlarmActivity.this, R.xml.set_alarm_prefs,false);
 	    
+	    
+	   
 	    /* prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	    // prefs.registerOnSharedPreferenceChangeListener(this);
         */	
@@ -79,6 +83,7 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
 	    	alarm.setAlert(Settings.System.DEFAULT_ALARM_ALERT_URI);
 	    	//Toast.makeText(getApplicationContext(),"Extra Not Receibed : " + alarm , Toast.LENGTH_LONG).show();
 	    }
+	    
 	    alarm.setAlarmFormat(AlarmFormat.HOUR_12);
 		menuTimePref = findPreference("time");
 		menuTimePref.setSummary(alarm.getTimeStr());
@@ -97,6 +102,7 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
 		
 		menuRepeat = (RepeatPreference) findPreference("setRepeat");
 		menuRepeat.setSummary(alarm.getDaysOfWeek().toString(getApplicationContext(), true));
+		menuRepeat.setDaysOfWeek(alarm.getDaysOfWeek());
 		
 		menuRingtone = (RingtonePreference) findPreference("ringtone");
 		menuRingtone.setSummary(RingtoneManager.getRingtone(
@@ -214,8 +220,22 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
 	}
 	
 	private void removeAlarmFromManager(Alarm alarm){
-		PendingIntent alarmIntent = composePendingAlarmIntent(alarm);
-		alarmMgr.cancel(alarmIntent);
+		//PendingIntent alarmIntent = composePendingAlarmIntent(alarm);
+		alarm.setAlarmFormat(AlarmFormat.HOUR_24);
+		Log.d("Before Delete",alarm.toString());
+		List<PendingIntent> pIntents = alarmPendingItents(alarm);
+		
+		try{
+			for(PendingIntent pIntent:pIntents){
+				alarmMgr.cancel(pIntent);
+			}
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		
+		//alarmMgr.cancel(alarmIntent);
 	}
 
 	@Override
@@ -230,13 +250,15 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
 		intent.putExtra(AlarmEntry.COLUMN_NAME_ALERT,alarm.getAlert().toString());
 		intent.putExtra("Alarm",alarm);
 		//intent.putExtra(name, value)
-		PendingIntent alarmIntent = PendingIntent.getActivity(this, Integer.parseInt(alarm.getHour() + "" + alarm.getMinutes()), intent,
+        Log.d("Alarm Ñ ", "" + alarm.toString());
+        Log.d("Alarm Intent ID : ", "" + Integer.parseInt( "1" + alarm.getId() + "" + alarm.getSelectedDay()  +   "00" +  alarm.getHour() + "" + alarm.getMinutes()));
+		PendingIntent alarmIntent = PendingIntent.getActivity(this, Integer.parseInt( "1" + alarm.getId() + "" + alarm.getSelectedDay()  +   "00" +  alarm.getHour() + "" + alarm.getMinutes()), intent,
 				PendingIntent.FLAG_CANCEL_CURRENT);
 		return alarmIntent;
 	}
 
 	public void setAlarm(Alarm alarm) {
-		/*alarm.setAlarmFormat(AlarmFormat.HOUR_24);
+		alarm.setAlarmFormat(AlarmFormat.HOUR_24);/*
 		alarmMgr = (AlarmManager) getSystemService(Activity.ALARM_SERVICE);
 		Intent intent = new Intent(this, AlarmReceiverActivity.class);
 		intent.putExtra(AlarmEntry.COLUMN_NAME_ALERT,alarm.getAlert().toString());
@@ -244,30 +266,45 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
 		//intent.putExtra(name, value)
 		PendingIntent alarmIntent = PendingIntent.getActivity(this, Integer.parseInt(alarm.getHour() + "" + alarm.getMinutes()), intent,
 				PendingIntent.FLAG_CANCEL_CURRENT);*/
-		PendingIntent alarmIntent = composePendingAlarmIntent(alarm);
+		PendingIntent alarmIntent;// = composePendingAlarmIntent(alarm);
+		
+//		PendingIntent alarmIntent;
 		// Set the alarm to start at
-		Calendar calendar = Calendar.getInstance();
+		/*Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(System.currentTimeMillis());
 		calendar.set(Calendar.HOUR_OF_DAY, alarm.getHour());
 		calendar.set(Calendar.MINUTE, alarm.getMinutes());
 		calendar.set(Calendar.SECOND, 0);
 	    calendar.set(Calendar.MILLISECOND, 0);
-		String days = Integer.toBinaryString(alarm.getDaysOfWeek().getCoded());
-		
-		char[] daysC = days.toCharArray();
-		
-		for(int i = daysC.length ,iday=1 ; i > 0 ; i--,iday++){
-			if(iday == 7 ){
+		String days = alarm.getDaysOfWeek().getBinCoded();
+		*/
+		char[] daysC = alarm.getDaysOfWeek().getBinCoded().toCharArray();
+		/*PendingIntent[]  alarmIntents = {composePendingAlarmIntent(alarm),composePendingAlarmIntent(alarm),
+				                         composePendingAlarmIntent(alarm),composePendingAlarmIntent(alarm),
+				                         composePendingAlarmIntent(alarm),composePendingAlarmIntent(alarm),
+				                         composePendingAlarmIntent(alarm)};*/
+		//Toast.makeText(getApplicationContext(),"Dasy : " + alarm.getDaysOfWeek().toString() + " , Code :  " + days  ,Toast.LENGTH_LONG  ).show();
+		for(int i = 0 ; i < daysC.length ; i++){
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTimeInMillis(System.currentTimeMillis());
+			calendar.set(Calendar.HOUR_OF_DAY, alarm.getHour());
+			calendar.set(Calendar.MINUTE, alarm.getMinutes());
+			calendar.set(Calendar.SECOND, 0);
+		    calendar.set(Calendar.MILLISECOND, 0);
+			if(i == 6 ){
 				calendar.set(Calendar.DAY_OF_WEEK,(1));
+				
 			}else{
-				calendar.set(Calendar.DAY_OF_WEEK,(1+i));
-			}
+				calendar.set(Calendar.DAY_OF_WEEK,((i+1) + 1));
+			}		
 			
-			if(calendar.getTimeInMillis() <= System.currentTimeMillis() ){
+			if(  Calendar.getInstance().getTimeInMillis() >  calendar.getTimeInMillis() ){
 				calendar.setTimeInMillis(calendar.getTimeInMillis() + (7*24*60*60*1000));
 			}
 			
-			if (daysC[i-1] == '1') {
+			if (daysC[i] == '1') {
+				alarm.setSelectedDay(i+1);
+				alarmIntent = composePendingAlarmIntent(alarm);
 				Log.d("Alarm ","Setted : " + calendar.getTime());
 				alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
 						calendar.getTimeInMillis(), 7 * 24 * 60 * 60 * 1000,
@@ -275,23 +312,24 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
 			}
 			
 		}
-		
-		/*/
-		calSet.set(Calendar.DAY_OF_WEEK, week);
-        calSet.set(Calendar.HOUR_OF_DAY, hour);
-        calSet.set(Calendar.MINUTE, minuts);
-        calSet.set(Calendar.SECOND, 0);
-        calSet.set(Calendar.MILLISECOND, 0);
 
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-                calSet.getTimeInMillis(), 1 * 60 * 60 * 1000, pendingIntent);
-     
-		 
-		 */
+	}
+	
+	public List<PendingIntent> alarmPendingItents(Alarm alarm){
 		
-		// setRepeating() lets you specify a precise 
-		//alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(), 1 * 24 * 60 * 60 * 1000, alarmIntent);
-
+		List<PendingIntent> pendingIntents = new ArrayList<PendingIntent>();
+		char[] days = alarm.getDaysOfWeek().getBinCoded().toCharArray();
+		for(int i = 0 ; i < days.length ; i++){	
+			
+			if (days[i] == '1') {
+				alarm.setSelectedDay(i+1);
+				PendingIntent alarmIntent = composePendingAlarmIntent(alarm);
+				pendingIntents.add(alarmIntent);
+			}
+			
+		}
+		
+		return pendingIntents;
 	}
 
 	public void setTime() {
@@ -333,7 +371,7 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
 		
 	public void saveAlarm(Alarm alarm){
 		if(alarm.getId() == 0){
-			alarmDAO.createAlarm(alarm);
+			this.alarm.setId(alarmDAO.createAlarm(alarm));
 		}else{
 			alarmDAO.update(alarm);
 		}
@@ -359,8 +397,9 @@ public class SetAlarmActivity extends PreferenceActivity /*implements OnSharedPr
 		}
 		alarm.setVibrate(menuVibrate.isChecked());
 		alarm.setRandomRingtone(menuRandomRington.isChecked());
-		setAlarm(alarm);
+		Log.d("Alarm times:",alarm.toString());
 		saveAlarm(alarm);
+		setAlarm(alarm);
 		alarmDAO.close();
 	}
 

@@ -66,7 +66,8 @@ public class AlarmDAO {
 	 * @param alarm
 	 *            Label
 	 */
-	public void createAlarm(Alarm alarm) {
+	public int createAlarm(Alarm alarm) {
+		alarm.setAlarmFormat(Alarm.AlarmFormat.HOUR_24);
 		ContentValues contentValues = new ContentValues();
 		contentValues.put(AlarmEntry.COLUMN_NAME_ENABLED, alarm.isEnabled() ? 1	: 0);
 		contentValues.put(AlarmEntry.COLUMN_NAME_HOUR, alarm.getHour());
@@ -79,7 +80,7 @@ public class AlarmDAO {
 		contentValues.put(AlarmEntry.COLUMN_NAME_DAYSOFWEEK,alarm.getDaysOfWeek().getCoded());
 		contentValues.put(AlarmEntry.COLUMN_NAME_RANDOM, alarm.isRandomRingtone() ? 1 : 0);
 		// Insert into DB
-		db.insert("alarms", null, contentValues);
+		return (int)db.insert("alarms", null, contentValues);
 	}
 
 	/**
@@ -160,5 +161,6 @@ public class AlarmDAO {
 				         AlarmEntry._ID + " = ?",
 				         new String[] { String.valueOf(alarm.getId()) });
 	}
-
+	
+	
 }

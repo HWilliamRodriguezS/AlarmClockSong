@@ -24,6 +24,7 @@ import android.widget.ToggleButton;
 import com.bootbraing.alarmclocksong.R;
 import com.bootbraing.alarmclocksong.dao.AlarmDAO;
 import com.bootbraing.alarmclocksong.models.Alarm;
+import com.bootbraing.alarmclocksong.models.Alarm.AlarmFormat;
 
 public class MainAlarmActivity extends Activity {
 
@@ -136,11 +137,13 @@ public class MainAlarmActivity extends Activity {
 				}
 			});
 			
-			Log.d("Alarm ID","Alarm ID : " + alrm.getId());
+			/*Log.d("Alarm ID","Alarm ID : " + alrm.getId());
 			Log.d("Alarm Label","Alarm Label : " + alrm.getLabel() );
 			Log.d("Alarm Days","Alarm Days : " + alrm.getDaysOfWeek().toString(this, false));
 			Log.d("Alarm Ringtone","Alarm Ringtone : " + alrm.getAlert().toString());
-			Log.d("Alarm Random","Alarm Random : " + alrm.isRandomRingtone());
+			Log.d("Alarm Random","Alarm Random : " + alrm.isRandomRingtone());*/
+			alrm.setAlarmFormat(AlarmFormat.HOUR_24);
+			Log.d("Alarm Details" , " Alarm : " + alrm.toString());
 			Log.d("Alarm Repeating" , "Days : " + Integer.toBinaryString(alrm.getDaysOfWeek().getCoded()));
 			Log.d("=====","======");
 			//Log.d(" ","");

@@ -27,6 +27,12 @@ public class Alarm implements Parcelable {
 	private AlarmFormat alarmFormat = AlarmFormat.HOUR_24;
 	private boolean randomRingtone ;
 	
+	/*  
+	 none=0,sun=1,mon=2...sat=7,all=8
+	  */
+	private int selectedDay = 0;
+	
+	
 	public Alarm(){
 		
 	}
@@ -85,6 +91,10 @@ public class Alarm implements Parcelable {
 		if(this.alarmFormat == AlarmFormat.HOUR_12 && hour > 12){
 		   return (Integer) ((this.hour == 0)?"12":hour - 12);			
 		}
+		else if(this.alarmFormat == AlarmFormat.HOUR_12 && hour == 0){
+			return 12;
+		}
+		
 		return hour;
 	}
 
@@ -149,6 +159,7 @@ public class Alarm implements Parcelable {
 	}
 	
 	public String getTimeStr(){
+		this.alarmFormat = AlarmFormat.HOUR_12;
 		return String.format(Locale.getDefault(),"%2d:%02d %s",getHour(),getMinutes(),getAMPM()) ;
 	}
 	
@@ -267,7 +278,20 @@ public class Alarm implements Parcelable {
         public int getCoded() {
             return mDays;
         }
-
+        
+        public String getBinCoded(){
+        	String days = Integer.toBinaryString(getCoded());
+    		char[] daysC = days.toCharArray();
+    		char[] daysBin = new char[daysC.length];
+    		String code ="";
+    		for(int i = (daysC.length -1) ,iday=0 ; i >= 0 ; i--,iday++){
+    			daysBin[iday]=daysC[i];
+    			code +=daysC[i];
+    		}
+    		
+        	return code;
+        }
+        
         // Returns days of week encoded in an array of booleans.
         public boolean[] getBooleanArray() {
             boolean[] ret = new boolean[7];
@@ -329,6 +353,14 @@ public class Alarm implements Parcelable {
 
 	public void setRandomRingtone(boolean randomRingtone) {
 		this.randomRingtone = randomRingtone;
+	}
+
+	public int getSelectedDay() {
+		return selectedDay;
+	}
+
+	public void setSelectedDay(int selectedDay) {
+		this.selectedDay = selectedDay;
 	}
 
 	public static final Parcelable.Creator<Alarm> CREATOR = new Parcelable.Creator<Alarm>() {
