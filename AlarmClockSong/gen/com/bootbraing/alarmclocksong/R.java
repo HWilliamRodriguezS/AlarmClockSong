@@ -25,12 +25,14 @@ public final class R {
         public static final int activity_vertical_margin=0x7f060001;
     }
     public static final class drawable {
-        public static final int alarm_clock_24=0x7f020000;
-        public static final int alarm_clock_32=0x7f020001;
-        public static final int ic_alarm_clock_128=0x7f020002;
-        public static final int ic_alarm_clock_off_32=0x7f020003;
-        public static final int ic_alarm_clock_on_32=0x7f020004;
-        public static final int ic_launcher=0x7f020005;
+        public static final int acs_full_ic=0x7f020000;
+        public static final int acs_ic_default=0x7f020001;
+        public static final int acs_ic_default_1=0x7f020002;
+        public static final int acs_ic_notification=0x7f020003;
+        public static final int acs_ic_notification_default=0x7f020004;
+        public static final int acs_normal_ic=0x7f020005;
+        public static final int acs_unselected_ic=0x7f020006;
+        public static final int ic_launcher=0x7f020007;
     }
     public static final class id {
         public static final int Button=0x7f0a0003;
@@ -40,7 +42,6 @@ public final class R {
         public static final int alarm_cancel=0x7f0a0008;
         public static final int alarm_delete=0x7f0a0009;
         public static final int alarm_save=0x7f0a0007;
-        public static final int notifications=0x7f0a000d;
         public static final int seekBar1=0x7f0a000b;
         public static final int snoozeAlarm=0x7f0a0006;
         public static final int stat=0x7f0a000a;

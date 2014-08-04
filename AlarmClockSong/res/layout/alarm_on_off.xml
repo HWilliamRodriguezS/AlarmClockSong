@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/ic_alarm_clock_on_32"
+    <item android:drawable="@drawable/acs_full_ic"
           android:state_checked="true" />
-    <item android:drawable="@drawable/ic_alarm_clock_off_32"
+    <item android:drawable="@drawable/acs_unselected_ic"
         android:state_checked="false"/>
  </selector>

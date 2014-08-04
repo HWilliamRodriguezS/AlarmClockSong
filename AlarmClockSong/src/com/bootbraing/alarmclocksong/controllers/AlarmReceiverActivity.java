@@ -10,6 +10,7 @@ import java.util.Random;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -30,6 +31,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -109,7 +111,7 @@ public class AlarmReceiverActivity extends Activity {
         
 		String body = "The body of the notification";
 		String title = "Title Of Notification";
-		Notification n = new Notification(R.drawable.alarm_clock_24,body,System.currentTimeMillis());
+		Notification n = new Notification(R.drawable.acs_ic_default,body,System.currentTimeMillis());
 		n.setLatestEventInfo(this, title, body, pi);
 		n.defaults = Notification.DEFAULT_ALL;
 		notifMgr.notify(ALARM_RECEIVER_ACTIVITY,n);
@@ -130,8 +132,15 @@ public class AlarmReceiverActivity extends Activity {
 //		notifMgr.notify(ALARM_RECEIVER_ACTIVITY,n);
 //        // notifMgr.
 
-        
-        
+        /*Unlock the Screen to show the Activity*/
+		KeyguardManager keyguardManager = (KeyguardManager)getSystemService(Context.KEYGUARD_SERVICE);
+		if (keyguardManager.inKeyguardRestrictedInputMode()) 
+		{
+		    Window window = this.getWindow();//Activity.getWindow();
+		    window.addFlags(LayoutParams.FLAG_DISMISS_KEYGUARD);
+		    window.addFlags(LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+		    window.addFlags(LayoutParams.FLAG_TURN_SCREEN_ON);
+		} 
         
     }
     
@@ -290,7 +299,8 @@ public class AlarmReceiverActivity extends Activity {
     private void stopAlarm(){
     	mMediaPlayer.stop();
         turnVibratorOn(false);
-        finish();    	
+        finish();    
+        moveTaskToBack(true);
     }
 
 	private void snoozeAlarm(){

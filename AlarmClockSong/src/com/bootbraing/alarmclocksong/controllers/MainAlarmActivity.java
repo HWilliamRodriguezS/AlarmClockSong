@@ -56,15 +56,9 @@ public class MainAlarmActivity extends Activity {
 		default:
 		case R.id.action_settings:
 		Intent i = new Intent(this, AlarmPreferences.class);
-		startActivityForResult(i, 10);
-		
-		
+		startActivityForResult(i, 10);	
 		break;
-		
-		case R.id.notifications :
-			Intent i2 = new Intent(this, AlarmNotificationBar.class);
-			startActivityForResult(i2, 12);
-		break;
+	
 		}
 		
 		return super.onOptionsItemSelected(item);
@@ -100,6 +94,9 @@ public class MainAlarmActivity extends Activity {
 			tbOnOff.setHeight(128);
 			tbOnOff.setBackgroundColor(Color.TRANSPARENT);
 			tbOnOff.setButtonDrawable(R.layout.alarm_on_off);
+			tbOnOff.setTextOff("");
+			tbOnOff.setTextOn("");
+			tbOnOff.setText("");
 			
 			/*tbOnOff.setWidth(64\\);
 			tbOnOff.setHeight(64);
