@@ -54,14 +54,20 @@
     
     <string name="stop_alarm" >Stop Alarm</string>
     
+    <string name="stop">Stop</string>
+    
     <string name="time_7_am" >7:00</string>
     
     <string name="snooze_alarm" >Snooze duration</string>
+    
+    <string name="snooze">Snooze</string>
     
     <string name="random_ringtone">Random Ringtone</string>
     
     <string name="submit">Submit</string>
     
     <string name="notification">Notification</string>
+    
+    <string name="alarm_alert">Alarm Alert!</string>
     
 </resources>

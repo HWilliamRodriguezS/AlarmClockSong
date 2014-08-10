@@ -3,36 +3,48 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainAlarmActivity" >
     
-   <LinearLayout android:layout_width="match_parent"
-                 android:layout_height="wrap_content" 
-                 android:onClick="addNewAlarm">
+   <LinearLayout android:id="@+id/mainAlarmLayout"
+                 android:layout_width="match_parent"
+                 android:layout_height="64sp" 
+                 android:onClick="addNewAlarm"
+                 android:gravity="center">
        
        <Button android:id="@+id/addAlarm"
                android:background="@android:drawable/ic_input_add"
                android:layout_width="wrap_content"
                android:layout_height="wrap_content" 
-               
               
                />
        
        <TextView android:text="@string/add_alarm"
                  android:layout_width="wrap_content" 
                  android:layout_height="wrap_content"
-               
+			     android:textSize="24sp"
                  />
+     <!--   <ToggleButton 
+           android:textOn=""
+           android:textOff=""
+           android:text=""
+           android:background="@layout/alarm_on_off"
+           android:layout_width="128px" 
+           android:layout_height="128px"
+           android:gravity="center"
+           android:id="@+id/turnon"
+           /> -->
    </LinearLayout>
-   <TableLayout android:id="@+id/tAlarms" android:layout_width="fill_parent"
-       		     android:layout_height="wrap_content" 
+  <!--  <LinearLayout 
+       android:layout_width="fill_parent"
+	   android:layout_height="2dip"
+	   android:background="#00FFFF"></LinearLayout> -->
+	   <View style="@style/HorizontalDivider"/>
+<!-- 	   <View ></View> -->
+   <TableLayout android:id="@+id/tAlarms" 
+                android:layout_width="fill_parent"
+       		    android:layout_height="wrap_content" 
        		     >
             
    </TableLayout>
-
-    
 
 </LinearLayout>

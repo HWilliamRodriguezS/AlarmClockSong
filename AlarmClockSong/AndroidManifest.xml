@@ -37,7 +37,9 @@
         
         <activity
             android:name="com.bootbraing.alarmclocksong.controllers.AlarmReceiverActivity"
-            android:label="@string/set_alarm" >
+            android:label="@string/set_alarm" 
+            >
+            <!--             android:theme="@android:style/Theme.Dialog" -->
             <intent-filter>
                 <action android:name="android.intent.action.SET_ALARM" />
 

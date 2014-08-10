@@ -33,6 +33,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bootbraing.alarmclocksong.R;
@@ -50,10 +51,13 @@ public class AlarmReceiverActivity extends Activity {
 	
 	private Button stopAlarm;
 	private Button snoozeAlarm; 
+	private TextView tvAlarmLabel;
+	private TextView tvAlarmTime;
 	
 	private NotificationManager notifMgr;
 	
-    @Override
+    @SuppressWarnings("deprecation")
+	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
@@ -74,29 +78,23 @@ public class AlarmReceiverActivity extends Activity {
 				notifMgr.cancel(ALARM_RECEIVER_ACTIVITY);
 			}
 		});
-        /*stopAlarm.setOnTouchListener(new OnTouchListener() {
-            public boolean onTouch(View arg0, MotionEvent arg1) {
-            	stopAlarm();
-                return false;
-            }
-        });
-        */
+
         snoozeAlarm = (Button)findViewById(R.id.snoozeAlarm);
         snoozeAlarm.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				//Toast.makeText(getApplicationContext(),"Got clicked", Toast.LENGTH_SHORT).show();
 				snoozeAlarm();
 				stopAlarm();
 				
 			}
 		});
-        
+         
         playSound(this, getAlarmUri());
         
         if(alarm.isVibrate()){
             turnVibratorOn(true);
         }
+        
         
         notifMgr=  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         //Intent newIntent = new Intent(Intent.ACTION_MAIN);
@@ -107,32 +105,21 @@ public class AlarmReceiverActivity extends Activity {
         intent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT|Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pi = PendingIntent.getActivity(this, 0, intent,  PendingIntent.FLAG_UPDATE_CURRENT);
         
-       
+        tvAlarmLabel = (TextView) findViewById(R.id.alarm_label);  //alarm.getLabel();
+        tvAlarmLabel.setText(alarm.getLabel());
+        
+        tvAlarmTime = (TextView) findViewById(R.id.alarm_time);
+        
+        
+        tvAlarmTime.setText(alarm.getTimeStr());
         
 		String body = "The body of the notification";
 		String title = "Title Of Notification";
-		Notification n = new Notification(R.drawable.acs_ic_default,body,System.currentTimeMillis());
+		Notification n = new Notification(R.drawable.ic_stat_notify_alarm,body,System.currentTimeMillis());
 		n.setLatestEventInfo(this, title, body, pi);
 		n.defaults = Notification.DEFAULT_ALL;
 		notifMgr.notify(ALARM_RECEIVER_ACTIVITY,n);
         
-        //Notification n = new Notification(R.drawable.alarm_clock_24,body,System.currentTimeMillis());
-        
-//        Intent notificationIntent = new Intent(Intent.ACTION_MAIN);
-//        notificationIntent.setClass(getApplicationContext(),AlarmReceiverActivity.class);
-//        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |Intent.FLAG_ACTIVITY_SINGLE_TOP);
-//        Notification n = new Notification(R.drawable.alarm_clock_24,body,System.currentTimeMillis());
-//	;
-//        
-//        PendingIntent notificationPendingIntent = PendingIntent.getActivity(this,
-//       		 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-//        
-//    	n.setLatestEventInfo(this, title, body, notificationPendingIntent);
-//		n.defaults = Notification.DEFAULT_ALL;
-//		notifMgr.notify(ALARM_RECEIVER_ACTIVITY,n);
-//        // notifMgr.
-
-        /*Unlock the Screen to show the Activity*/
 		KeyguardManager keyguardManager = (KeyguardManager)getSystemService(Context.KEYGUARD_SERVICE);
 		if (keyguardManager.inKeyguardRestrictedInputMode()) 
 		{
@@ -153,7 +140,6 @@ public class AlarmReceiverActivity extends Activity {
     
 		Uri[] allRingtones ;
 		List<Uri> listRingtones = new ArrayList<Uri>();
-		//int ringTypes[] = {RingtoneManager.TYPE_ALARM,RingtoneManager.TYPE_RINGTONE,RingtoneManager.TYPE_NOTIFICATION,1024};
 		
 		for (int ringType : ringTypes) {
 			
@@ -279,15 +265,10 @@ public class AlarmReceiverActivity extends Activity {
 							: values[i];
 					Toast.makeText(getApplicationContext()," Value :  " + splited[i],Toast.LENGTH_LONG).show();
 				}
-				//Toast.makeText(getApplicationContext(),	" lenght : " + values.length + " , and value : " + values[0], Toast.LENGTH_LONG).show();
 
 			}
-        	//Object eo = soundList.get("soundList");
-        	//Toast.makeText(getApplicationContext()," Prefs " + soundList,Toast.LENGTH_LONG).show();
-        	//Log.d("Prefs " , "Prefs :" + soundList.get("soundList"));
         	
         	if(values != null){
-        		//Toast.makeText(getApplicationContext()," Inside ",Toast.LENGTH_LONG).show();
         		Uri tmpRing = getRandomRingtone(values);
         	  alarm.setAlert(tmpRing);
         	}
@@ -306,25 +287,27 @@ public class AlarmReceiverActivity extends Activity {
 	private void snoozeAlarm(){
 		alarm.setAlarmFormat(AlarmFormat.HOUR_24);
 		AlarmManager alarmMgr = (AlarmManager) getSystemService(Activity.ALARM_SERVICE);
-		Intent intent = new Intent(this, AlarmReceiverActivity.class);
-		intent.putExtra(AlarmEntry.COLUMN_NAME_ALERT,alarm.getAlert().toString());
-		intent.putExtra("Alarm",alarm);
+		
 		//intent.putExtra(name, value)
-		PendingIntent alarmIntent = PendingIntent.getActivity(this, Integer.parseInt(alarm.getHour() + "" + alarm.getMinutes()), intent,
-				PendingIntent.FLAG_CANCEL_CURRENT);
+		
 
 		// Set the alarm to start at
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(System.currentTimeMillis());
-		//calendar.set(Calendar.HOUR_OF_DAY, alarm.getHour());
-		//calendar.set(Calendar.MINUTE, alarm.getMinutes());
 
-		// setRepeating() lets you specify a precise 
-//	    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 	    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 	    String snooze = prefs.getString("snooze", "5");
-//	    Integer snooze =(Integer) prefs.getInt("snooze", 5);
-	//    Toast.makeText(getApplicationContext(),"znoose value : " + snooze, Toast.LENGTH_SHORT).show();
+	    
+	    alarm.setMinutes(calendar.get(Calendar.MINUTE));
+	    alarm.setHour(calendar.get(Calendar.HOUR_OF_DAY)); // gets hour in 24h format.get(Calendar.HOUR_OF_DAY)); // gets hour in 24h format);
+	    
+	    Intent intent = new Intent(this, AlarmReceiverActivity.class);
+		intent.putExtra(AlarmEntry.COLUMN_NAME_ALERT,alarm.getAlert().toString());
+		intent.putExtra("Alarm",alarm);
+		
+	    PendingIntent alarmIntent = PendingIntent.getActivity(this, Integer.parseInt(alarm.getHour() + "" + alarm.getMinutes()), intent,
+				PendingIntent.FLAG_CANCEL_CURRENT);
+	    
 		alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
 				calendar.getTimeInMillis() + ((Integer.parseInt(snooze)) * 60 * 1000), 0, alarmIntent);
 		
