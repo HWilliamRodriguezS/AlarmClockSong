@@ -293,7 +293,7 @@ public class AlarmReceiverActivity extends Activity {
 
 		// Set the alarm to start at
 		Calendar calendar = Calendar.getInstance();
-		calendar.setTimeInMillis(System.currentTimeMillis());
+		calendar.setTimeInMillis(System.currentTimeMillis() + (  5 * 60 * 1000) );
 
 	    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 	    String snooze = prefs.getString("snooze", "5");
@@ -309,7 +309,7 @@ public class AlarmReceiverActivity extends Activity {
 				PendingIntent.FLAG_CANCEL_CURRENT);
 	    
 		alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
-				calendar.getTimeInMillis() + ((Integer.parseInt(snooze)) * 60 * 1000), 0, alarmIntent);
+			/* calendar.getTimeInMillis() */ System.currentTimeMillis() + ((Integer.parseInt(snooze)) * 60 * 1000), 0, alarmIntent);
 		
 	}
 

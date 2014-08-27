@@ -12,7 +12,7 @@ import android.os.Parcelable;
 import com.bootbraing.alarmclocksong.R;
 
 
-public class Alarm implements Parcelable {
+public class Alarm implements Parcelable,Cloneable {
 
 	private int id = 0;
 	private boolean enabled = false;
@@ -372,5 +372,27 @@ public class Alarm implements Parcelable {
             return new Alarm[size];
         }
     };
+
+
+    @Override
+	public Object clone() throws CloneNotSupportedException {
+		/*Alarm clonedAlarm = new Alarm();
+		
+		clonedAlarm.id = id;
+		clonedAlarm.enabled = enabled;
+		clonedAlarm.hour = hour;
+		clonedAlarm.minutes = minutes;
+		clonedAlarm.daysOfWeek = daysOfWeek;
+		clonedAlarm.time = time;
+		clonedAlarm.vibrate = vibrate;
+		clonedAlarm.label = label;
+		clonedAlarm.alert = alert;
+		clonedAlarm.silent = silent;
+		clonedAlarm.alarmFormat = AlarmFormat.HOUR_24;
+		clonedAlarm.randomRingtone = randomRingtone;
+		
+		return clonedAlarm;*/
+		return super.clone();
+	}
 	
 }

@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
 import com.bootbraing.alarmclocksong.models.Alarm;
+import com.bootbraing.alarmclocksong.models.Alarm.AlarmFormat;
 import com.bootbraing.alarmclocksong.models.AlarmReaderContract.AlarmEntry;
 
 public class AlarmDAO {
@@ -121,7 +122,6 @@ public class AlarmDAO {
 		Alarm alarm;
 		while (!cursor.isAfterLast()) {
 			alarm = new Alarm();
-
 			alarm.setId(cursor.getInt(0));
 			alarm.setEnabled((cursor.getInt(2) == 1) ? true : false);
 			alarm.setHour(cursor.getInt(3));
@@ -142,7 +142,7 @@ public class AlarmDAO {
 
 	public int update(Alarm alarm) {
 		// TODO Auto-generated method stub
-		
+		alarm.setAlarmFormat(AlarmFormat.HOUR_24);
 		ContentValues contentValues = new ContentValues();
 		contentValues.put(AlarmEntry.COLUMN_NAME_ENABLED, alarm.isEnabled() ? 1	: 0);
 		contentValues.put(AlarmEntry.COLUMN_NAME_HOUR, alarm.getHour());

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.R.drawable;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -33,6 +34,7 @@ import com.bootbraing.alarmclocksong.dao.AlarmDAO;
 import com.bootbraing.alarmclocksong.models.Alarm;
 import com.bootbraing.alarmclocksong.models.Alarm.AlarmFormat;
 
+@SuppressLint("ClickableViewAccessibility")
 public class MainAlarmActivity extends Activity {
 
 	//	private final int MAIN_ALARM_ACTIVITY = 1;
@@ -91,12 +93,15 @@ public class MainAlarmActivity extends Activity {
 	}
 	
 	public void editAlarm(Alarm alarm){
+		alarm.setAlarmFormat(AlarmFormat.HOUR_24);
+//		Log.e("Before PutExtra","Alarm : " + alarm);
 		Intent i = new Intent(this, SetAlarmActivity.class);
         i.putExtra("Alarm", alarm);
 		startActivityForResult(i, SET_ALARM_ACTIVITY);
 		
 	}
 	
+	@SuppressLint("RtlHardcoded")
 	public void listAllAlarms() {
 		alarms = new AlarmDAO(this).getAlarms();
 
@@ -175,7 +180,7 @@ public class MainAlarmActivity extends Activity {
 			tbr.setGravity(Gravity.CENTER);
 
 			TableRow row1_1 = new TableRow(this);
-			Log.e("TableLayout " , "Width : " + tbr.getWidth());
+			//Log.e("TableLayout " , "Width : " + tbr.getWidth());
 			TextView tvAlarmTitle = new TextView(this);
 			tvAlarmTitle.setText("" + alrm.getLabel());
 			tvAlarmTitle.setGravity(Gravity.CENTER);
@@ -203,7 +208,7 @@ public class MainAlarmActivity extends Activity {
 			//tvAlarmTime.setTextSize(metrics.scaledDensity);
 			tvAlarmTime.setTypeface(Typeface.DEFAULT_BOLD);
 			tvAlarmTime.setGravity(Gravity.CENTER);
-			
+			//Log.e("Alarm Data : "," Alarm : " + alrm.toString());
 			tvAlarmTime.setText("" + alrm.getTimeStr());
 		    LayoutParams atParam = new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT,0.3f);
 		    atParam.gravity = Gravity.RIGHT;
@@ -237,7 +242,9 @@ public class MainAlarmActivity extends Activity {
 					((TableRow)v).setBackgroundResource(drawable.list_selector_background);
 					return false;
 				}
+				
 			});
+			
 			row.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
