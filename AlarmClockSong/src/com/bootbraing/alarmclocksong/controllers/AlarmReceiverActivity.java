@@ -27,6 +27,7 @@ import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
@@ -34,7 +35,6 @@ import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bootbraing.alarmclocksong.R;
 import com.bootbraing.alarmclocksong.models.Alarm;
@@ -71,7 +71,6 @@ public class AlarmReceiverActivity extends Activity {
  
         stopAlarm = (Button) findViewById(R.id.stopAlarm);
         stopAlarm.setOnClickListener(new View.OnClickListener() {
-			
 			@Override
 			public void onClick(View v) {
 				stopAlarm();
@@ -85,36 +84,29 @@ public class AlarmReceiverActivity extends Activity {
 			public void onClick(View arg0) {
 				snoozeAlarm();
 				stopAlarm();
-				
 			}
 		});
          
         playSound(this, getAlarmUri());
-        
         if(alarm.isVibrate()){
             turnVibratorOn(true);
         }
         
-        
         notifMgr=  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        //Intent newIntent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         intent.setClass(this, AlarmReceiverActivity.class);
-        //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
         intent.addFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT|Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pi = PendingIntent.getActivity(this, 0, intent,  PendingIntent.FLAG_UPDATE_CURRENT);
         
-        tvAlarmLabel = (TextView) findViewById(R.id.alarm_label);  //alarm.getLabel();
+        tvAlarmLabel = (TextView) findViewById(R.id.alarm_label);
         tvAlarmLabel.setText(alarm.getLabel());
-        
+       
         tvAlarmTime = (TextView) findViewById(R.id.alarm_time);
-        
-        
         tvAlarmTime.setText(alarm.getTimeStr());
         
-		String body = "The body of the notification";
-		String title = "Title Of Notification";
+		String body = "Alarm : " + alarm.getTimeStr() + " , " + alarm.getLabel();
+		String title = "Alarm Alart!";
 		Notification n = new Notification(R.drawable.ic_stat_notify_alarm,body,System.currentTimeMillis());
 		n.setLatestEventInfo(this, title, body, pi);
 		n.defaults = Notification.DEFAULT_ALL;
@@ -180,17 +172,14 @@ public class AlarmReceiverActivity extends Activity {
 		        selection,
 		        null,
 		        null);
-		//listRingtones = new ArrayList<Uri>();
+
 		List<String> songs = new ArrayList<String>();
 		while(cursor.moveToNext()){
-		        songs.add(cursor.getString(3) );
-		        //Uri uriSong= Uri.parse("");
-		        listRingtones.add(Uri.parse(cursor.getString(3)));
+			songs.add(cursor.getString(3) );
+		    listRingtones.add(Uri.parse(cursor.getString(3)));
 		}
 		
-		
 		/* Ending */
-		//Toast.makeText(getApplicationContext(),"Music : " + songs,Toast.LENGTH_LONG).show();
 		allRingtones = new Uri[listRingtones.size()];
 		listRingtones.toArray(allRingtones);
 		return allRingtones[new Random(new Date().getTime()).nextInt(allRingtones.length)];
@@ -198,7 +187,6 @@ public class AlarmReceiverActivity extends Activity {
     
     @Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-
 		return super.onCreateOptionsMenu(menu);
 	}
     
@@ -215,7 +203,7 @@ public class AlarmReceiverActivity extends Activity {
                 mMediaPlayer.start();
             }
         } catch (IOException e) {
-            System.out.println("OOPS");
+            Log.e("AlarmReceiver : ",e.getMessage());
         }
     }
     
@@ -229,11 +217,8 @@ public class AlarmReceiverActivity extends Activity {
     }
  
     private Uri getAlarmUri() {
-      
-        //Log.d("Before getting in " ,alarm.getAlert() + "");
         if (alarm.getAlert() == null  || alarm.getAlert().toString() == "" ) {
             alarm.setAlert(Settings.System.DEFAULT_ALARM_ALERT_URI);
-            //Log.d("Default Alarm :" ,Settings.System.DEFAULT_ALARM_ALERT_URI + "'");
             if (alarm.getAlert() == null  || alarm.getAlert().toString() == "") {
             	alarm.setAlert(Settings.System.DEFAULT_ALARM_ALERT_URI);
             }
@@ -241,10 +226,9 @@ public class AlarmReceiverActivity extends Activity {
         
         if(alarm.isRandomRingtone()){
         	
-        	
         	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         	Map<String,?> soundList = prefs.getAll();
-        	String str ;//= soundList.get("soundList").toString();
+        	String str ;
         	int[] values = null;
 			if (soundList.get("soundList") != null && soundList.get("soundList") != "") {
 				str = soundList.get("soundList").toString();
@@ -253,24 +237,17 @@ public class AlarmReceiverActivity extends Activity {
 				values = new int[splited.length];
 				
 				for (int i = 0; i < splited.length; i++) {
-					// {"Ringtones","Alerts","Notifications","MusicLibrary"};
-					// {RingtoneManager.TYPE_ALARM,RingtoneManager.TYPE_RINGTONE,RingtoneManager.TYPE_NOTIFICATION,1024};
-					values[i] = (splited[i].equals("Ringtones")) ? RingtoneManager.TYPE_ALARM
-							: 256;
-					values[i] = (splited[i].equals("Alerts")) ? RingtoneManager.TYPE_RINGTONE
-							: values[i];
-					values[i] = (splited[i].equals("Notifications")) ? RingtoneManager.TYPE_NOTIFICATION
-							: values[i];
-					values[i] = (splited[i].equals("MusicLibrary")) ? 1024
-							: values[i];
-					Toast.makeText(getApplicationContext()," Value :  " + splited[i],Toast.LENGTH_LONG).show();
+					values[i] = (splited[i].equals("Ringtones")) ? RingtoneManager.TYPE_ALARM : 256;
+					values[i] = (splited[i].equals("Alerts")) ? RingtoneManager.TYPE_RINGTONE : values[i];
+					values[i] = (splited[i].equals("Notifications")) ? RingtoneManager.TYPE_NOTIFICATION : values[i];
+					values[i] = (splited[i].equals("MusicLibrary")) ? 1024	: values[i];
 				}
 
 			}
         	
         	if(values != null){
         		Uri tmpRing = getRandomRingtone(values);
-        	  alarm.setAlert(tmpRing);
+        	    alarm.setAlert(tmpRing);
         	}
         }
         
@@ -288,10 +265,6 @@ public class AlarmReceiverActivity extends Activity {
 		alarm.setAlarmFormat(AlarmFormat.HOUR_24);
 		AlarmManager alarmMgr = (AlarmManager) getSystemService(Activity.ALARM_SERVICE);
 		
-		//intent.putExtra(name, value)
-		
-
-		// Set the alarm to start at
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(System.currentTimeMillis() + (  5 * 60 * 1000) );
 
@@ -299,7 +272,7 @@ public class AlarmReceiverActivity extends Activity {
 	    String snooze = prefs.getString("snooze", "5");
 	    
 	    alarm.setMinutes(calendar.get(Calendar.MINUTE));
-	    alarm.setHour(calendar.get(Calendar.HOUR_OF_DAY)); // gets hour in 24h format.get(Calendar.HOUR_OF_DAY)); // gets hour in 24h format);
+	    alarm.setHour(calendar.get(Calendar.HOUR_OF_DAY));
 	    
 	    Intent intent = new Intent(this, AlarmReceiverActivity.class);
 		intent.putExtra(AlarmEntry.COLUMN_NAME_ALERT,alarm.getAlert().toString());
@@ -309,7 +282,7 @@ public class AlarmReceiverActivity extends Activity {
 				PendingIntent.FLAG_CANCEL_CURRENT);
 	    
 		alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
-			/* calendar.getTimeInMillis() */ System.currentTimeMillis() + ((Integer.parseInt(snooze)) * 60 * 1000), 0, alarmIntent);
+	             System.currentTimeMillis() + ((Integer.parseInt(snooze)) * 60 * 1000), 0, alarmIntent);
 		
 	}
 

@@ -25,33 +25,34 @@ public final class R {
         public static final int activity_vertical_margin=0x7f060001;
     }
     public static final class drawable {
-        public static final int acs_full_ic=0x7f020000;
-        public static final int acs_ic_default=0x7f020001;
-        public static final int acs_ic_notification_default=0x7f020002;
-        public static final int acs_normal_ic=0x7f020003;
-        public static final int acs_unselected_ic=0x7f020004;
-        public static final int horizontal_gradle=0x7f020005;
-        public static final int ic_launcher=0x7f020006;
-        public static final int ic_stat_notify_alarm=0x7f020007;
-        public static final int ic_toggle_off=0x7f020008;
-        public static final int ic_toggle_on=0x7f020009;
-        public static final int vertical_gradle=0x7f02000a;
+        public static final int acs_ic_default=0x7f020000;
+        public static final int horizontal_gradle=0x7f020001;
+        public static final int ic_launcher=0x7f020002;
+        public static final int ic_stat_notify_alarm=0x7f020003;
+        public static final int ic_toggle_off=0x7f020004;
+        public static final int ic_toggle_on=0x7f020005;
+        public static final int vertical_gradle=0x7f020006;
     }
     public static final class id {
         public static final int Button=0x7f0a0004;
         public static final int EditText=0x7f0a0005;
-        public static final int action_settings=0x7f0a000f;
+        public static final int RadioMAnswer1=0x7f0a000a;
+        public static final int RadioMAnswer2=0x7f0a000b;
+        public static final int RadioMAnswer3=0x7f0a000c;
+        public static final int RadioMAnswer4=0x7f0a000d;
+        public static final int action_settings=0x7f0a0014;
         public static final int addAlarm=0x7f0a0001;
-        public static final int alarm_cancel=0x7f0a000b;
-        public static final int alarm_delete=0x7f0a000c;
+        public static final int alarm_cancel=0x7f0a0011;
+        public static final int alarm_delete=0x7f0a0012;
         public static final int alarm_label=0x7f0a0006;
-        public static final int alarm_save=0x7f0a000a;
+        public static final int alarm_save=0x7f0a0010;
         public static final int alarm_time=0x7f0a0007;
         public static final int mainAlarmLayout=0x7f0a0000;
-        public static final int seekBar1=0x7f0a000e;
-        public static final int snoozeAlarm=0x7f0a0009;
-        public static final int stat=0x7f0a000d;
-        public static final int stopAlarm=0x7f0a0008;
+        public static final int mathQuestion=0x7f0a0008;
+        public static final int radioMathQ=0x7f0a0009;
+        public static final int snoozeAlarm=0x7f0a000f;
+        public static final int stat=0x7f0a0013;
+        public static final int stopAlarm=0x7f0a000e;
         public static final int tAlarms=0x7f0a0002;
         public static final int time=0x7f0a0003;
     }
@@ -63,7 +64,6 @@ public final class R {
         public static final int alarm_save_cancel=0x7f030004;
         public static final int statusbar=0x7f030005;
         public static final int vertical_divisor=0x7f030006;
-        public static final int volumen_seekbar=0x7f030007;
     }
     public static final class menu {
         public static final int main_alarm=0x7f090000;
@@ -143,9 +143,17 @@ public final class R {
  All customizations that are NOT specific to a particular API-level can go here. 
          */
         public static final int AppTheme=0x7f080001;
-        public static final int HorizontalDivider=0x7f080002;
-        public static final int Theme_Transparent=0x7f080004;
-        public static final int VerticalDivider=0x7f080003;
+        /** 
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+
+        
+         */
+        public static final int AppThemeBlack=0x7f080002;
+        public static final int HorizontalDivider=0x7f080003;
+        public static final int Theme_Transparent=0x7f080005;
+        public static final int VerticalDivider=0x7f080004;
     }
     public static final class xml {
         public static final int alarm_preferences=0x7f040000;

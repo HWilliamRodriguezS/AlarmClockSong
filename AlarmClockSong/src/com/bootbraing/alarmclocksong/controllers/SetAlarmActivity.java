@@ -1,10 +1,8 @@
 package com.bootbraing.alarmclocksong.controllers;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
@@ -36,16 +34,10 @@ import com.bootbraing.alarmclocksong.R;
 import com.bootbraing.alarmclocksong.dao.AlarmDAO;
 import com.bootbraing.alarmclocksong.models.Alarm;
 import com.bootbraing.alarmclocksong.models.Alarm.AlarmFormat;
-import com.bootbraing.alarmclocksong.models.AlarmReaderContract.AlarmEntry;
 import com.bootbraing.alarmclocksong.utils.RepeatPreference;
 
-public class SetAlarmActivity extends PreferenceActivity /*
-														 * implements
-														 * OnSharedPreferenceChangeListener
-														 */{
+public class SetAlarmActivity extends PreferenceActivity{
 
-	// private final int MAIN_ALARM_ACTIVITY = 1;
-	// private final int SET_ALARM_ACTIVITY = 2;
 	private AlarmManager alarmMgr;
 	private AlarmDAO alarmDAO;
 
@@ -62,8 +54,8 @@ public class SetAlarmActivity extends PreferenceActivity /*
 
 	private Alarm alarm = new Alarm();
 	private Alarm editAlarm;
-
-	// private SharedPreferences prefs;
+	
+	private Alarms alarms;
 
 	@SuppressWarnings("deprecation")
 	@Override
@@ -72,15 +64,17 @@ public class SetAlarmActivity extends PreferenceActivity /*
 		addPreferencesFromResource(R.xml.set_alarm_prefs);
 		PreferenceManager.setDefaultValues(SetAlarmActivity.this,
 				R.xml.set_alarm_prefs, false);
-
+		alarms = new Alarms(getApplicationContext());
+		
 		Intent intent = getIntent();
 		editAlarm = (Alarm) intent.getParcelableExtra("Alarm");
-//		Log.e("After Loaded ", "Alarm" + editAlarm);
 		
 		if (editAlarm != null) {
-			try{
+			try {
 				alarm = (Alarm) editAlarm.clone();
-			}catch(CloneNotSupportedException e){}
+			} catch (CloneNotSupportedException e) {
+				Log.e("SetAlarmActivity","Exception : " + e.getMessage());
+			}
 		} else {
 			alarm.setAlert(Settings.System.DEFAULT_ALARM_ALERT_URI);
 		}
@@ -92,8 +86,8 @@ public class SetAlarmActivity extends PreferenceActivity /*
 		menuLabelPref = (EditTextPreference) findPreference("label");
 		menuLabelPref.setSummary(alarm.getLabel());
 		menuLabelPref.setText(alarm.getLabel());
-		menuLabelPref
-				.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+		menuLabelPref.setOnPreferenceChangeListener(
+				new Preference.OnPreferenceChangeListener() {
 					public boolean onPreferenceChange(Preference p,
 							Object newValue) {
 						p.setSummary((String) newValue);
@@ -111,8 +105,8 @@ public class SetAlarmActivity extends PreferenceActivity /*
 				getApplicationContext(), alarm.getAlert()).getTitle(
 				getApplicationContext()));
 
-		menuRingtone
-				.setOnPreferenceChangeListener(new RingtonePreference.OnPreferenceChangeListener() {
+		menuRingtone.setOnPreferenceChangeListener(
+				new RingtonePreference.OnPreferenceChangeListener() {
 					public boolean onPreferenceChange(Preference p,
 							Object newValue) {
 
@@ -123,7 +117,6 @@ public class SetAlarmActivity extends PreferenceActivity /*
 						p.setSummary((String) name);
 						return true;
 					}
-
 				});
 
 		menuVibrate = (CheckBoxPreference) findPreference("vibrate");
@@ -134,8 +127,6 @@ public class SetAlarmActivity extends PreferenceActivity /*
 
 		alarmDAO = new AlarmDAO(this);
 
-		// We have to do this to get the save/cancel buttons to highlight on
-		// their own.
 		getListView().setItemsCanFocus(true);
 
 		// Grab the content view so we can modify it.
@@ -159,19 +150,14 @@ public class SetAlarmActivity extends PreferenceActivity /*
 		ll.addView(lv, lp);
 
 		// Inflate the buttons onto the LinearLayout.
-		View v = LayoutInflater.from(this).inflate(R.layout.alarm_save_cancel,
-				ll);
+		View v = LayoutInflater.from(this).inflate(R.layout.alarm_save_cancel,ll);
 
 		// Attach actions to each button.
 		buttonAcept = (Button) v.findViewById(R.id.alarm_save);
 		buttonAcept.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				// Enable the alarm when clicking "Done"
-				// mEnabled = true;
 				if (editAlarm != null) {
 					editAlarm.setAlarmFormat(AlarmFormat.HOUR_24);
-//					Log.e("Alarm BBB", "Alarm Before Delete : " + editAlarm);
-//					Log.e("Alarm AAA", "Alarm Before Delete : " + alarm);
 					removeAlarmFromManager(editAlarm);
 				}
 				acceptSettedAlarm();
@@ -185,6 +171,7 @@ public class SetAlarmActivity extends PreferenceActivity /*
 				finish();
 			}
 		});
+		
 		buttonCancel.setEnabled(false);
 
 		buttonDelete = (Button) v.findViewById(R.id.alarm_delete);
@@ -192,16 +179,13 @@ public class SetAlarmActivity extends PreferenceActivity /*
 
 			@Override
 			public void onClick(View v) {
-				// removeAlarmFromManager(alarm);
 				alarm.setAlarmFormat(AlarmFormat.HOUR_24);
 				deleteAlarm(alarm);
 				finish();
 			}
 		});
 		
-		// Replace the old content view with our new one.
 		setContentView(ll);
-
 	}
 
 	protected void deleteAlarm(Alarm alarm) {
@@ -211,14 +195,12 @@ public class SetAlarmActivity extends PreferenceActivity /*
 
 	private void removeAlarmFromManager(Alarm alarm) {
 		alarm.setAlarmFormat(AlarmFormat.HOUR_24);
-		List<PendingIntent> pIntents = alarmPendingItents(alarm);
+		List<PendingIntent> pIntents = alarms.alarmPendingItents(alarm);//alarmPendingItents(alarm);
 
 		try {
 			for (PendingIntent pIntent : pIntents) {
 				alarmMgr.cancel(pIntent);
-				//Log.e("Removing", "pIntent " + pIntent);
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -227,151 +209,6 @@ public class SetAlarmActivity extends PreferenceActivity /*
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		return super.onCreateOptionsMenu(menu);
-	}
-
-	public PendingIntent composePendingAlarmIntent(Alarm alarm) {
-		alarm.setAlarmFormat(AlarmFormat.HOUR_24);
-		alarmMgr = (AlarmManager) getSystemService(Activity.ALARM_SERVICE);
-		Intent intent = new Intent(this, AlarmReceiverActivity.class);
-		intent.putExtra(AlarmEntry.COLUMN_NAME_ALERT, alarm.getAlert()
-				.toString());
-		intent.putExtra("Alarm", alarm);
-		/*Log.e("Alarm Details : ",
-				""
-						+ Integer.parseInt("1" + alarm.getId() + ""
-								+ alarm.getSelectedDay() + "00"
-								+ alarm.getHour() + "" + alarm.getMinutes()));*/
-		PendingIntent alarmIntent = PendingIntent.getActivity(
-				this,
-				Integer.parseInt("1" + alarm.getId() + ""
-						+ alarm.getSelectedDay() + "00" + alarm.getHour() + ""
-						+ alarm.getMinutes()), intent,
-				PendingIntent.FLAG_CANCEL_CURRENT);
-		return alarmIntent;
-	}
-
-	public void setAlarm(Alarm alarm) {
-
-		alarm.setAlarmFormat(AlarmFormat.HOUR_24);
-		PendingIntent alarmIntent;
-
-		String daysS = alarm.getDaysOfWeek().getBinCoded();
-		char[] daysC = daysS.toCharArray();
-
-		if (daysS.equals("1111111")) {
-
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTimeInMillis(System.currentTimeMillis());
-			calendar.set(Calendar.HOUR_OF_DAY, alarm.getHour());
-			calendar.set(Calendar.MINUTE, alarm.getMinutes());
-			calendar.set(Calendar.SECOND, 0);
-			calendar.set(Calendar.MILLISECOND, 0);
-
-			alarm.setSelectedDay(8);
-			alarmIntent = composePendingAlarmIntent(alarm);
-
-			if (Calendar.getInstance().getTimeInMillis() > calendar
-					.getTimeInMillis()) {
-				calendar.setTimeInMillis(calendar.getTimeInMillis()
-						+ (24 * 60 * 60 * 1000));
-			}
-
-			alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
-					calendar.getTimeInMillis(), 7 * 24 * 60 * 60 * 1000,
-					alarmIntent);
-			/*
-			 * Log.e("alarm weedly etted ", " Setted : " +
-			 * calendar.getTimeInMillis());
-			 */
-
-		} else if (daysS.equals("0")) {
-
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTimeInMillis(System.currentTimeMillis());
-			calendar.set(Calendar.HOUR_OF_DAY, alarm.getHour());
-			calendar.set(Calendar.MINUTE, alarm.getMinutes());
-			calendar.set(Calendar.SECOND, 0);
-			calendar.set(Calendar.MILLISECOND, 0);
-
-			alarm.setSelectedDay(0);
-			alarmIntent = composePendingAlarmIntent(alarm);
-
-			if (Calendar.getInstance().getTimeInMillis() > calendar
-					.getTimeInMillis()) {
-				calendar.setTimeInMillis(calendar.getTimeInMillis()
-						+ (24 * 60 * 60 * 1000));
-			}
-			/*
-			 * Log.e("alarm setted once", " Setted : " +
-			 * calendar.getTimeInMillis());
-			 */
-			alarmMgr.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-					alarmIntent);
-
-		} else {
-
-			for (int i = 0; i < daysC.length; i++) {
-				Calendar calendar = Calendar.getInstance();
-				calendar.setTimeInMillis(System.currentTimeMillis());
-				calendar.set(Calendar.HOUR_OF_DAY, alarm.getHour());
-				calendar.set(Calendar.MINUTE, alarm.getMinutes());
-				calendar.set(Calendar.SECOND, 0);
-				calendar.set(Calendar.MILLISECOND, 0);
-				if (i == 6) {
-					calendar.set(Calendar.DAY_OF_WEEK, (1));
-
-				} else {
-					calendar.set(Calendar.DAY_OF_WEEK, ((i + 1) + 1));
-				}
-
-				if (Calendar.getInstance().getTimeInMillis() > calendar
-						.getTimeInMillis()) {
-					calendar.setTimeInMillis(calendar.getTimeInMillis()
-							+ (7 * 24 * 60 * 60 * 1000));
-				}
-
-				if (daysC[i] == '1') {
-					alarm.setSelectedDay(i + 1);
-					alarmIntent = composePendingAlarmIntent(alarm);
-
-					alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
-							calendar.getTimeInMillis(),
-							7 * 24 * 60 * 60 * 1000, alarmIntent);
-				}
-
-			}
-		}
-
-	}
-
-	public List<PendingIntent> alarmPendingItents(Alarm alarm) {
-
-		List<PendingIntent> pendingIntents = new ArrayList<PendingIntent>();
-		String daysS = alarm.getDaysOfWeek().getBinCoded();
-		char[] days = alarm.getDaysOfWeek().getBinCoded().toCharArray();
-
-		if (daysS.equals("0")) {
-			alarm.setSelectedDay(0);
-			PendingIntent alarmIntent = composePendingAlarmIntent(alarm);
-			pendingIntents.add(alarmIntent);
-		} else if (daysS.equals("1111111")) {
-			alarm.setSelectedDay(8);
-			PendingIntent alarmIntent = composePendingAlarmIntent(alarm);
-			pendingIntents.add(alarmIntent);
-		} else {
-
-			for (int i = 0; i < days.length; i++) {
-
-				if (days[i] == '1') {
-					alarm.setSelectedDay(i + 1);
-					PendingIntent alarmIntent = composePendingAlarmIntent(alarm);
-					pendingIntents.add(alarmIntent);
-				}
-
-			}
-		}
-
-		return pendingIntents;
 	}
 
 	public void setTime() {
@@ -405,7 +242,6 @@ public class SetAlarmActivity extends PreferenceActivity /*
 		if (preference == menuTimePref) {
 			setTime();
 		}
-
 		buttonCancel.setEnabled(true);
 		return super.onPreferenceTreeClick(preferenceScreen, preference);
 	}
@@ -414,7 +250,6 @@ public class SetAlarmActivity extends PreferenceActivity /*
 		if (alarm.getId() == 0) {
 			this.alarm.setId(alarmDAO.createAlarm(alarm));
 		} else {
-			Log.d("Alarm Before Update" , " Alarm : " + alarm);
 			alarmDAO.update(alarm);
 		}
 	}
@@ -426,12 +261,7 @@ public class SetAlarmActivity extends PreferenceActivity /*
 	}
 
 	public void acceptSettedAlarm() {
-		/*
-		 * if(editAlarm != null){ Log.e("Before ","Alarm" + editAlarm);
-		 * //deleteAlarm(editAlarm);
-		 * //editAlarm.setAlarmFormat(AlarmFormat.HOUR_12);
-		 * removeAlarmFromManager(editAlarm); //alarm.id }
-		 */
+
 		alarm.setEnabled(true);
 		alarm.setSilent(false);
 		alarm.setLabel((String) menuLabelPref.getSummary());
@@ -447,9 +277,8 @@ public class SetAlarmActivity extends PreferenceActivity /*
 		alarm.setVibrate(menuVibrate.isChecked());
 		alarm.setRandomRingtone(menuRandomRington.isChecked());
 		saveAlarm(alarm);
-		setAlarm(alarm);
-		alarmDAO.close();
-		
+		alarms.setAlarm(getApplicationContext(), alarm);
+		alarmDAO.close();	
 	}
 
 }

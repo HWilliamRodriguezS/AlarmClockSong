@@ -17,14 +17,6 @@ public class OnOffAlarm {
 	public void turnAlarmOffOn(Alarm alarm, boolean offOn, Context context) {
 		AlarmManager alarmManager = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
-		/*
-		 * Intent intent = new Intent(context, AlarmReceiverActivity.class);
-		 * PendingIntent alarmIntent = PendingIntent.getActivity(context,
-		 * Integer.parseInt(alarm.getHour() + "" + alarm.getMinutes()), intent,
-		 * PendingIntent.FLAG_CANCEL_CURRENT);
-		 * 
-		 * alarmManager.cancel(alarmIntent);
-		 */
 
 		Alarms alarms = new Alarms(context);
 
@@ -41,11 +33,7 @@ public class OnOffAlarm {
 				e.printStackTrace();
 			}
 
-			Log.d("", "REMOVE ALARM :  " + alarm.toString());
+			Log.d("OnOffAlarm ", "DISABLE ALARM :  " + alarm.toString());
 		}
 	}
-
-	public void setOnStateChangeListener() {
-	}
-
 }

@@ -27,9 +27,6 @@ public class Alarm implements Parcelable,Cloneable {
 	private AlarmFormat alarmFormat = AlarmFormat.HOUR_24;
 	private boolean randomRingtone ;
 	
-	/*  
-	 none=0,sun=1,mon=2...sat=7,all=8
-	  */
 	private int selectedDay = 0;
 	
 	
