@@ -1,5 +1,6 @@
 <resources>
-
+<color name="white_opaque">#FFFFFFFF</color>
+<color name="pitch_black">#FF000000</color>
     <!--
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
@@ -24,6 +25,9 @@
             backward-compatibility can go here.
 
         -->
+        
+    </style><style name="AppThemeWhite" parent="android:Theme.Light">
+
     </style>
 
     <style name="HorizontalDivider">

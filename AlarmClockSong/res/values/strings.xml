@@ -7,6 +7,9 @@
     <!-- The text displayed when you open the preferences of the app -->
     <string name="action_settings">Settings</string>
     
+    <!-- The text displayed when you open the preferences of the app -->
+    <string name="action_exit">Exit</string>
+    
     <!-- Text displayed when you push the button 'add alarm' -->
     <string name="add_alarm">Add Alarm</string>
     
@@ -69,5 +72,13 @@
     <string name="notification">Notification</string>
     
     <string name="alarm_alert">Alarm Alert!</string>
+    
+    <string name="themes" >Themes</string>
+    
+    <string name="alarm_setted" >You\'ve setted an alarm for </string>
+    
+    <string name="alarm_snoozed" >You\'ve snoozed an alarm for </string>
+    
+    <string name="at" > at </string>
     
 </resources>

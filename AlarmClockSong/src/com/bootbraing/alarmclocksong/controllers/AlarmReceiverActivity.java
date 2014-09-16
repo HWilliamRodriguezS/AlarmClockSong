@@ -35,11 +35,11 @@ import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bootbraing.alarmclocksong.R;
 import com.bootbraing.alarmclocksong.models.Alarm;
 import com.bootbraing.alarmclocksong.models.Alarm.AlarmFormat;
-import com.bootbraing.alarmclocksong.models.AlarmReaderContract.AlarmEntry;
 
 public class AlarmReceiverActivity extends Activity {
 
@@ -67,6 +67,9 @@ public class AlarmReceiverActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        
+//        LinearLayout  linearLayout = (LinearLayout) findViewById(R.id.linearLayoutid);
+//        linearLayout.setBackgroundResource(R.drawable.background_fingerboard);
         setContentView(R.layout.alarm_receiver);
  
         stopAlarm = (Button) findViewById(R.id.stopAlarm);
@@ -75,6 +78,28 @@ public class AlarmReceiverActivity extends Activity {
 			public void onClick(View v) {
 				stopAlarm();
 				notifMgr.cancel(ALARM_RECEIVER_ACTIVITY);
+				
+				
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+				if(prefs.contains("snoozedAlamr")){
+					//long intentID = Long.parseLong(prefs.getString("snoozedAlarm", "0"));
+					String snooze = prefs.getString("snooze", "5");
+					
+					Calendar calendar = Calendar.getInstance();
+					calendar.setTimeInMillis(System.currentTimeMillis() + (  (Integer.parseInt(snooze)) * 60 * 1000) );
+				    
+				    alarm.setMinutes(calendar.get(Calendar.MINUTE));
+				    alarm.setHour(calendar.get(Calendar.HOUR_OF_DAY));
+				    
+				    PendingIntent pIntent = new Alarms(getApplicationContext()).composePendingAlarmIntent(getApplicationContext(), alarm);
+				  
+					AlarmManager alrmgr = (AlarmManager) getSystemService(Activity.ALARM_SERVICE);
+					alrmgr.cancel(pIntent);
+					Log.d("Intent ID " , "Intent ID : " + Integer.parseInt(alarm.getHour() + "" + alarm.getMinutes()));
+					prefs.edit().remove("snoozedAlamr").commit();
+				}
+				
+				
 			}
 		});
 
@@ -82,17 +107,36 @@ public class AlarmReceiverActivity extends Activity {
         snoozeAlarm.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
+				
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+				if(prefs.contains("snoozedAlamr")){
+					//long intentID = Long.parseLong(prefs.getString("snoozedAlarm", "0"));
+					String snooze = prefs.getString("snooze", "5");
+					
+					Calendar calendar = Calendar.getInstance();
+					calendar.setTimeInMillis(System.currentTimeMillis() + (  (Integer.parseInt(snooze)) * 60 * 1000) );
+				    
+				    alarm.setMinutes(calendar.get(Calendar.MINUTE));
+				    alarm.setHour(calendar.get(Calendar.HOUR_OF_DAY));
+				    
+				    PendingIntent pIntent = new Alarms(getApplicationContext()).composePendingAlarmIntent(getApplicationContext(), alarm);
+				  
+					AlarmManager alrmgr = (AlarmManager) getSystemService(Activity.ALARM_SERVICE);
+					alrmgr.cancel(pIntent);
+					Log.d("Intent ID " , "Intent ID : " + Integer.parseInt(alarm.getHour() + "" + alarm.getMinutes()));
+					prefs.edit().remove("snoozedAlamr").commit();
+				}
 				snoozeAlarm();
 				stopAlarm();
 			}
 		});
          
-        playSound(this, getAlarmUri());
+        playSound(getApplicationContext(), getAlarmUri());
         if(alarm.isVibrate()){
             turnVibratorOn(true);
         }
         
-        notifMgr=  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notifMgr =  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         intent.addCategory(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         intent.setClass(this, AlarmReceiverActivity.class);
@@ -109,7 +153,11 @@ public class AlarmReceiverActivity extends Activity {
 		String title = "Alarm Alart!";
 		Notification n = new Notification(R.drawable.ic_stat_notify_alarm,body,System.currentTimeMillis());
 		n.setLatestEventInfo(this, title, body, pi);
-		n.defaults = Notification.DEFAULT_ALL;
+		//n.defaults = Notification.DEFAULT_ALL;
+		n.defaults = 0;
+		n.defaults |= Notification.DEFAULT_LIGHTS;
+		n.defaults |= Notification.DEFAULT_VIBRATE;
+		//n.audioStreamType = AudioManager.RINGER_MODE_SILENT;
 		notifMgr.notify(ALARM_RECEIVER_ACTIVITY,n);
         
 		KeyguardManager keyguardManager = (KeyguardManager)getSystemService(Context.KEYGUARD_SERVICE);
@@ -263,26 +311,22 @@ public class AlarmReceiverActivity extends Activity {
 
 	private void snoozeAlarm(){
 		alarm.setAlarmFormat(AlarmFormat.HOUR_24);
-		AlarmManager alarmMgr = (AlarmManager) getSystemService(Activity.ALARM_SERVICE);
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		String snooze = prefs.getString("snooze", "5");
 		
 		Calendar calendar = Calendar.getInstance();
-		calendar.setTimeInMillis(System.currentTimeMillis() + (  5 * 60 * 1000) );
-
-	    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-	    String snooze = prefs.getString("snooze", "5");
+		calendar.setTimeInMillis(System.currentTimeMillis() + (  (Integer.parseInt(snooze)) * 60 * 1000) );
 	    
 	    alarm.setMinutes(calendar.get(Calendar.MINUTE));
 	    alarm.setHour(calendar.get(Calendar.HOUR_OF_DAY));
-	    
-	    Intent intent = new Intent(this, AlarmReceiverActivity.class);
-		intent.putExtra(AlarmEntry.COLUMN_NAME_ALERT,alarm.getAlert().toString());
-		intent.putExtra("Alarm",alarm);
+	    alarm.setDaysOfWeek(new Alarm.DaysOfWeek(0));
+	    new Alarms(getApplicationContext()).setAlarm(getApplicationContext(), alarm);
 		
-	    PendingIntent alarmIntent = PendingIntent.getActivity(this, Integer.parseInt(alarm.getHour() + "" + alarm.getMinutes()), intent,
-				PendingIntent.FLAG_CANCEL_CURRENT);
-	    
-		alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP,
-	             System.currentTimeMillis() + ((Integer.parseInt(snooze)) * 60 * 1000), 0, alarmIntent);
+		prefs.edit().putString("snoozedAlamr", "" + snooze).commit();
+		Toast.makeText(getApplicationContext(), getString(R.string.alarm_snoozed) + " " + snooze + " minutes" , Toast.LENGTH_LONG).show();
+		
+		
 		
 	}
 

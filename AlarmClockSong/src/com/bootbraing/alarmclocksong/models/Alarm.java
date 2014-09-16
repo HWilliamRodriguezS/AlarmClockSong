@@ -182,8 +182,9 @@ public class Alarm implements Parcelable,Cloneable {
 		String fmt = "";
 		
 		if(this.alarmFormat == AlarmFormat.HOUR_12){
-			fmt=(this.hour > 12)?"PM":"AM";
-			
+			//this.setAlarmFormat(AlarmFormat.HOUR_24);
+			fmt=(this.hour >= 12)?"PM":"AM";
+			//this.setAlarmFormat(AlarmFormat.HOUR_12);
 		}
 		
 		return fmt;

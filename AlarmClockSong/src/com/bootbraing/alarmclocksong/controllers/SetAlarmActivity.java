@@ -3,6 +3,7 @@ package com.bootbraing.alarmclocksong.controllers;
 import java.util.Calendar;
 import java.util.List;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
@@ -27,6 +28,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 import android.widget.TableRow.LayoutParams;
 import android.widget.TimePicker;
 
@@ -78,7 +80,7 @@ public class SetAlarmActivity extends PreferenceActivity{
 		} else {
 			alarm.setAlert(Settings.System.DEFAULT_ALARM_ALERT_URI);
 		}
-
+		
 		alarm.setAlarmFormat(AlarmFormat.HOUR_12);
 		menuTimePref = findPreference("time");
 		menuTimePref.setSummary(alarm.getTimeStr());
@@ -160,6 +162,7 @@ public class SetAlarmActivity extends PreferenceActivity{
 					editAlarm.setAlarmFormat(AlarmFormat.HOUR_24);
 					removeAlarmFromManager(editAlarm);
 				}
+//				Log.e("Alarm Alert","" + alarm.getAlert());
 				acceptSettedAlarm();
 				finish();
 			}
@@ -181,6 +184,25 @@ public class SetAlarmActivity extends PreferenceActivity{
 			public void onClick(View v) {
 				alarm.setAlarmFormat(AlarmFormat.HOUR_24);
 				deleteAlarm(alarm);
+				SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+				if(prefs.contains("snoozedAlamr")){
+					//long intentID = Long.parseLong(prefs.getString("snoozedAlarm", "0"));
+					String snooze = prefs.getString("snooze", "5");
+					
+					Calendar calendar = Calendar.getInstance();
+					calendar.setTimeInMillis(System.currentTimeMillis() + (  (Integer.parseInt(snooze)) * 60 * 1000) );
+				    
+				    alarm.setMinutes(calendar.get(Calendar.MINUTE));
+				    alarm.setHour(calendar.get(Calendar.HOUR_OF_DAY));
+				    
+				    PendingIntent pIntent = new Alarms(getApplicationContext()).composePendingAlarmIntent(getApplicationContext(), alarm);
+				  
+					AlarmManager alrmgr = (AlarmManager) getSystemService(Activity.ALARM_SERVICE);
+					alrmgr.cancel(pIntent);
+					Log.d("Intent ID " , "Intent ID : " + Integer.parseInt(alarm.getHour() + "" + alarm.getMinutes()));
+					prefs.edit().remove("snoozedAlamr").commit();
+				}
+				
 				finish();
 			}
 		});
@@ -214,8 +236,16 @@ public class SetAlarmActivity extends PreferenceActivity{
 	public void setTime() {
 
 		Calendar mcurrentTime = Calendar.getInstance();
-		int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
-		int minute = mcurrentTime.get(Calendar.MINUTE);
+		int hour , minute;
+		if(this.alarm.getId() == 0){
+			hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+			minute = mcurrentTime.get(Calendar.MINUTE);
+		}else{
+			alarm.setAlarmFormat(AlarmFormat.HOUR_24);
+			hour = alarm.getHour();
+		    minute = alarm.getMinutes();
+		    alarm.setAlarmFormat(AlarmFormat.HOUR_12);
+		}
 		TimePickerDialog mTimePicker;
 		mTimePicker = new TimePickerDialog(SetAlarmActivity.this,
 				new TimePickerDialog.OnTimeSetListener() {
@@ -261,7 +291,7 @@ public class SetAlarmActivity extends PreferenceActivity{
 	}
 
 	public void acceptSettedAlarm() {
-
+		
 		alarm.setEnabled(true);
 		alarm.setSilent(false);
 		alarm.setLabel((String) menuLabelPref.getSummary());
@@ -277,8 +307,10 @@ public class SetAlarmActivity extends PreferenceActivity{
 		alarm.setVibrate(menuVibrate.isChecked());
 		alarm.setRandomRingtone(menuRandomRington.isChecked());
 		saveAlarm(alarm);
+		//Log.e("Alarm Alert","" + alarm.getAlert());
 		alarms.setAlarm(getApplicationContext(), alarm);
 		alarmDAO.close();	
+		Toast.makeText(getApplicationContext(), getString(R.string.alarm_setted) + " " + alarm.getDaysOfWeek().toString(getApplicationContext(), false) + " " + getString(R.string.at) + " " +  alarm.getTimeStr(), Toast.LENGTH_LONG).show();
 	}
 
 }

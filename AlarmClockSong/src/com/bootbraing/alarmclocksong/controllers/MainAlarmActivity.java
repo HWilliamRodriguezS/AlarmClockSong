@@ -88,6 +88,10 @@ public class MainAlarmActivity extends Activity {
 			Intent i = new Intent(this, AlarmPreferences.class);
 			startActivityForResult(i, 10);
 			break;
+			
+		/*
+		case R.id.action_exit:
+			finish();        */
 		}
 		return super.onOptionsItemSelected(item);
 	}
